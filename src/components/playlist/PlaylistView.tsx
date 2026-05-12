@@ -22,12 +22,17 @@ interface PlaylistViewProps {
   } | null;
 }
 
+const AUTOPLAY_STORAGE_KEY = "fm-playlist-autoplay-enabled";
+
 export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
   const [songs, setSongs] = useState<Song[]>(initialSongs);
   const [selectedYear, setSelectedYear] = useState<number>(getCurrentYear());
   const [selectedMonth, setSelectedMonth] = useState<number>(getCurrentMonth());
   const [searchQuery, setSearchQuery] = useState("");
   const [activeVideo, setActiveVideo] = useState<Song | null>(null);
+  const [autoplayEnabled, setAutoplayEnabled] = useState(false);
+  const [shouldAutoplayActiveVideo, setShouldAutoplayActiveVideo] =
+    useState(false);
 
   const {
     availableYears,
@@ -40,6 +45,17 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
     selectedYear,
     selectedMonth,
   });
+
+  useEffect(() => {
+    try {
+      const savedAutoplay = window.localStorage.getItem(AUTOPLAY_STORAGE_KEY);
+      if (savedAutoplay !== null) {
+        setAutoplayEnabled(savedAutoplay === "true");
+      }
+    } catch {
+      // Ignore unavailable localStorage, such as private browsing restrictions.
+    }
+  }, []);
 
   // Keep year and month selection valid as the search result set changes.
   useEffect(() => {
@@ -77,6 +93,35 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
     return filteredSongs[0] || null;
   }, [filteredSongs, activeVideo]);
 
+  useEffect(() => {
+    if (!activeVideo) return;
+
+    const activeVideoIsVisible = filteredSongs.some(
+      (song) => song.id === activeVideo.id
+    );
+
+    if (!activeVideoIsVisible) {
+      setShouldAutoplayActiveVideo(false);
+    }
+  }, [activeVideo, filteredSongs]);
+
+  const handleAutoplayToggle = useCallback(() => {
+    setAutoplayEnabled((currentValue) => {
+      const nextValue = !currentValue;
+
+      try {
+        window.localStorage.setItem(
+          AUTOPLAY_STORAGE_KEY,
+          nextValue ? "true" : "false"
+        );
+      } catch {
+        // Ignore unavailable localStorage, such as private browsing restrictions.
+      }
+
+      return nextValue;
+    });
+  }, []);
+
   const handleYearChange = useCallback(
     (year: number) => {
       setSelectedYear(year);
@@ -85,8 +130,22 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
         setSelectedMonth(monthsForYear[monthsForYear.length - 1]);
       }
       setActiveVideo(null);
+      setShouldAutoplayActiveVideo(false);
     },
     [getAvailableMonthsForYear]
+  );
+
+  const handleMonthChange = useCallback((month: number) => {
+    setSelectedMonth(month);
+    setShouldAutoplayActiveVideo(false);
+  }, []);
+
+  const handleSongSelect = useCallback(
+    (song: Song) => {
+      setActiveVideo(song);
+      setShouldAutoplayActiveVideo(autoplayEnabled);
+    },
+    [autoplayEnabled]
   );
 
   const handleTrackAdded = useCallback((song: Song) => {
@@ -94,6 +153,7 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
     setSelectedYear(song.year);
     setSelectedMonth(song.month);
     setActiveVideo(song);
+    setShouldAutoplayActiveVideo(false);
   }, []);
 
   return (
@@ -115,9 +175,33 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
               selectedYear={selectedYear}
               selectedMonth={selectedMonth}
               onYearChange={handleYearChange}
-              onMonthChange={setSelectedMonth}
+              onMonthChange={handleMonthChange}
             />
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
+            <div className="flex items-center justify-between gap-3 bg-white px-4 py-2 rounded-xl shadow-md border border-border w-full sm:w-auto min-h-[44px]">
+              <span
+                id="autoplay-switch-label"
+                className="text-sm font-bold text-foreground whitespace-nowrap"
+              >
+                Autoplay
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={autoplayEnabled}
+                aria-labelledby="autoplay-switch-label"
+                onClick={handleAutoplayToggle}
+                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                  autoplayEnabled ? "bg-primary" : "bg-switch-background"
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    autoplayEnabled ? "translate-x-5" : "translate-x-0.5"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
           {user && (
@@ -148,11 +232,19 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
           </motion.div>
         ) : (
           <div className="space-y-8">
-            {currentActive && <VideoPlayer song={currentActive} />}
+            {currentActive && (
+              <VideoPlayer
+                song={currentActive}
+                autoplay={
+                  shouldAutoplayActiveVideo &&
+                  activeVideo?.id === currentActive.id
+                }
+              />
+            )}
             <ThumbnailGrid
               songs={filteredSongs}
               activeVideoId={currentActive?.id || null}
-              onSelect={setActiveVideo}
+              onSelect={handleSongSelect}
             />
           </div>
         )}
