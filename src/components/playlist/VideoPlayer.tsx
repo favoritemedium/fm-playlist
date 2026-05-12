@@ -7,9 +7,10 @@ import { getYouTubeEmbedUrl } from "@/lib/youtube";
 
 interface VideoPlayerProps {
   song: Song;
+  autoplay?: boolean;
 }
 
-export function VideoPlayer({ song }: VideoPlayerProps) {
+export function VideoPlayer({ song, autoplay = false }: VideoPlayerProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -19,7 +20,7 @@ export function VideoPlayer({ song }: VideoPlayerProps) {
       <div className="relative aspect-video bg-black">
         <iframe
           key={song.id}
-          src={getYouTubeEmbedUrl(song.youtubeVideoId)}
+          src={getYouTubeEmbedUrl(song.youtubeVideoId, autoplay)}
           title={song.songTitle || "YouTube video"}
           className="absolute inset-0 w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

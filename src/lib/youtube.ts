@@ -59,6 +59,9 @@ export function getYouTubeThumbnailUrl(videoId: string): string {
   return `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`;
 }
 
-export function getYouTubeEmbedUrl(videoId: string): string {
-  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=0`;
+export function getYouTubeEmbedUrl(
+  videoId: string,
+  autoplay = false
+): string {
+  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=${autoplay ? 1 : 0}`;
 }
