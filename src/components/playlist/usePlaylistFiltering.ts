@@ -2,13 +2,31 @@
 
 import { useCallback, useMemo } from "react";
 import type { Song } from "@/types/song";
-import { getCurrentMonth, getCurrentYear } from "@/lib/constants";
+import {
+  getCurrentMonth,
+  getCurrentYear,
+  isAllFilterValue,
+  type PlaylistFilterValue,
+} from "@/lib/constants";
 
 interface UsePlaylistFilteringOptions {
   songs: Song[];
   searchQuery: string;
-  selectedYear: number;
-  selectedMonth: number;
+  selectedYear: PlaylistFilterValue;
+  selectedMonth: PlaylistFilterValue;
+}
+
+export function songMatchesMonthYearFilter(
+  song: Pick<Song, "month" | "year">,
+  selectedYear: PlaylistFilterValue,
+  selectedMonth: PlaylistFilterValue
+): boolean {
+  const matchesYear =
+    isAllFilterValue(selectedYear) || song.year === selectedYear;
+  const matchesMonth =
+    isAllFilterValue(selectedMonth) || song.month === selectedMonth;
+
+  return matchesYear && matchesMonth;
 }
 
 export function usePlaylistFiltering({
@@ -38,14 +56,17 @@ export function usePlaylistFiltering({
   }, [searchMatchedSongs, normalizedQuery]);
 
   const getAvailableMonthsForYear = useCallback(
-    (year: number) => {
+    (year: PlaylistFilterValue) => {
       const months = new Set(
         searchMatchedSongs
-          .filter((song) => song.year === year)
+          .filter((song) => isAllFilterValue(year) || song.year === year)
           .map((song) => song.month)
       );
 
-      if (!normalizedQuery && year === getCurrentYear()) {
+      if (
+        !normalizedQuery &&
+        (isAllFilterValue(year) || year === getCurrentYear())
+      ) {
         months.add(getCurrentMonth());
       }
 
@@ -61,8 +82,8 @@ export function usePlaylistFiltering({
 
   const filteredSongs = useMemo(
     () =>
-      searchMatchedSongs.filter(
-        (song) => song.year === selectedYear && song.month === selectedMonth
+      searchMatchedSongs.filter((song) =>
+        songMatchesMonthYearFilter(song, selectedYear, selectedMonth)
       ),
     [searchMatchedSongs, selectedYear, selectedMonth]
   );

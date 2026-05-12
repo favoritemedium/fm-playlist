@@ -3,7 +3,13 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
 import type { Song } from "@/types/song";
-import { getCurrentMonth, getCurrentYear } from "@/lib/constants";
+import {
+  ALL_FILTER_VALUE,
+  getCurrentMonth,
+  getCurrentYear,
+  isAllFilterValue,
+  type PlaylistFilterValue,
+} from "@/lib/constants";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MonthYearFilter } from "./MonthYearFilter";
@@ -26,8 +32,12 @@ const AUTOPLAY_STORAGE_KEY = "fm-playlist-autoplay-enabled";
 
 export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
   const [songs, setSongs] = useState<Song[]>(initialSongs);
-  const [selectedYear, setSelectedYear] = useState<number>(getCurrentYear());
-  const [selectedMonth, setSelectedMonth] = useState<number>(getCurrentMonth());
+  const [selectedYear, setSelectedYear] = useState<PlaylistFilterValue>(
+    getCurrentYear()
+  );
+  const [selectedMonth, setSelectedMonth] = useState<PlaylistFilterValue>(
+    getCurrentMonth()
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [activeVideo, setActiveVideo] = useState<Song | null>(null);
   const [autoplayEnabled, setAutoplayEnabled] = useState(false);
@@ -59,17 +69,18 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
 
   // Keep year and month selection valid as the search result set changes.
   useEffect(() => {
-    if (availableYears.length === 0) return;
+    let nextYear = selectedYear;
+    let nextMonth = selectedMonth;
 
-    const nextYear = availableYears.includes(selectedYear)
-      ? selectedYear
-      : availableYears[0];
+    if (!isAllFilterValue(selectedYear) && !availableYears.includes(selectedYear)) {
+      nextYear = ALL_FILTER_VALUE;
+      nextMonth = ALL_FILTER_VALUE;
+    }
+
     const monthsForYear = getAvailableMonthsForYear(nextYear);
-    if (monthsForYear.length === 0) return;
-
-    const nextMonth = monthsForYear.includes(selectedMonth)
-      ? selectedMonth
-      : monthsForYear[monthsForYear.length - 1];
+    if (!isAllFilterValue(nextMonth) && !monthsForYear.includes(nextMonth)) {
+      nextMonth = ALL_FILTER_VALUE;
+    }
 
     if (nextYear !== selectedYear) {
       setSelectedYear(nextYear);
@@ -123,19 +134,25 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
   }, []);
 
   const handleYearChange = useCallback(
-    (year: number) => {
+    (year: PlaylistFilterValue) => {
       setSelectedYear(year);
-      const monthsForYear = getAvailableMonthsForYear(year);
-      if (monthsForYear.length > 0) {
-        setSelectedMonth(monthsForYear[monthsForYear.length - 1]);
+
+      if (isAllFilterValue(year)) {
+        setSelectedMonth(ALL_FILTER_VALUE);
+      } else if (!isAllFilterValue(selectedMonth)) {
+        const monthsForYear = getAvailableMonthsForYear(year);
+        setSelectedMonth(
+          monthsForYear[monthsForYear.length - 1] ?? ALL_FILTER_VALUE
+        );
       }
+
       setActiveVideo(null);
       setShouldAutoplayActiveVideo(false);
     },
-    [getAvailableMonthsForYear]
+    [getAvailableMonthsForYear, selectedMonth]
   );
 
-  const handleMonthChange = useCallback((month: number) => {
+  const handleMonthChange = useCallback((month: PlaylistFilterValue) => {
     setSelectedMonth(month);
     setShouldAutoplayActiveVideo(false);
   }, []);

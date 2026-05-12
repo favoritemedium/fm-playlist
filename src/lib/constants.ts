@@ -3,6 +3,16 @@ export const ALLOWED_EMAIL_DOMAIN =
     .trim()
     .toLowerCase();
 
+export const ALL_FILTER_VALUE = "all" as const;
+
+export type PlaylistFilterValue = number | typeof ALL_FILTER_VALUE;
+
+export function isAllFilterValue(
+  value: PlaylistFilterValue
+): value is typeof ALL_FILTER_VALUE {
+  return value === ALL_FILTER_VALUE;
+}
+
 const MONTHS = [
   "January",
   "February",
@@ -32,4 +42,19 @@ export function getCurrentYear(): number {
 
 export function formatMonthYear(month: number, year: number): string {
   return `${getMonthName(month)} ${year}`;
+}
+
+export function formatPlaylistPeriod(
+  month: PlaylistFilterValue,
+  year: PlaylistFilterValue
+): string | null {
+  if (isAllFilterValue(month)) {
+    return isAllFilterValue(year) ? null : year.toString();
+  }
+
+  if (isAllFilterValue(year)) {
+    return getMonthName(month);
+  }
+
+  return formatMonthYear(month, year);
 }
