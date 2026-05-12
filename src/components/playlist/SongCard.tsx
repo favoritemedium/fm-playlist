@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { Play } from "lucide-react";
 import Image from "next/image";
 import type { Song } from "@/types/song";
@@ -15,12 +14,8 @@ interface SongCardProps {
 
 export function SongCard({ song, isActive, index, onClick }: SongCardProps) {
   return (
-    <motion.button
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ delay: index * 0.03 }}
+    <button
+      type="button"
       onClick={onClick}
       className={`group relative aspect-video bg-black rounded-xl overflow-hidden transition-all ${
         isActive
@@ -54,6 +49,6 @@ export function SongCard({ song, isActive, index, onClick }: SongCardProps) {
           {song.submitterName}
         </p>
       </div>
-    </motion.button>
+    </button>
   );
 }
