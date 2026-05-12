@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface SearchBarProps {
@@ -17,8 +17,18 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search by name, title, artist..."
         aria-label="Search tracks"
-        className="pl-10 bg-white border border-border shadow-md rounded-xl font-medium w-full h-full min-h-[44px]"
+        className="pl-10 pr-10 bg-white border border-border shadow-md rounded-xl font-medium w-full h-full min-h-[44px]"
       />
+      {value && (
+        <button
+          onClick={() => onChange("")}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+          aria-label="Clear search"
+          type="button"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 }
