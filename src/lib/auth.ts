@@ -2,6 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { ALLOWED_EMAIL_DOMAIN } from "@/lib/constants";
 
 export interface AppUser {
+  id: string;
   name: string;
   email: string;
   picture?: string;
@@ -38,6 +39,7 @@ export async function getCurrentAppAuth(): Promise<AppAuthResult> {
   return {
     status: "authenticated",
     user: {
+      id: user.id,
       name,
       email,
       picture: user.imageUrl || undefined,

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  SONG_COMMENT_MAX_LENGTH,
   SONG_DESCRIPTION_MAX_LENGTH,
   YOUTUBE_URL_MAX_LENGTH,
 } from "@/lib/song-limits";
@@ -29,3 +30,48 @@ export const createSongInputSchema = z
   .strict();
 
 export type ValidatedCreateSongInput = z.infer<typeof createSongInputSchema>;
+
+export const dbSongIdSchema = z
+  .string({ error: "Song ID is required" })
+  .regex(/^db_\d+$/, "Song ID must reference a database-backed song")
+  .transform((value) => Number(value.slice(3)));
+
+export const positiveIntegerParamSchema = z.coerce
+  .number({ error: "ID must be a number" })
+  .int("ID must be an integer")
+  .positive("ID must be positive");
+
+const commentBodySchema = z
+  .string({ error: "Comment must be text" })
+  .trim()
+  .min(1, "Comment cannot be empty")
+  .max(
+    SONG_COMMENT_MAX_LENGTH,
+    `Comment must be ${SONG_COMMENT_MAX_LENGTH} characters or fewer`
+  );
+
+export const createSongCommentInputSchema = z
+  .object({
+    body: commentBodySchema,
+    parentCommentId: z
+      .number({ error: "Parent comment ID must be a number" })
+      .int("Parent comment ID must be an integer")
+      .positive("Parent comment ID must be positive")
+      .optional()
+      .nullable()
+      .transform((value) => value ?? null),
+  })
+  .strict();
+
+export const updateSongCommentInputSchema = z
+  .object({
+    body: commentBodySchema,
+  })
+  .strict();
+
+export type ValidatedCreateSongCommentInput = z.infer<
+  typeof createSongCommentInputSchema
+>;
+export type ValidatedUpdateSongCommentInput = z.infer<
+  typeof updateSongCommentInputSchema
+>;

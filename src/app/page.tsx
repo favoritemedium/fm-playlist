@@ -51,7 +51,7 @@ export default async function HomePage() {
     );
   }
 
-  const songs = await getAllSongs();
+  const songs = await getAllSongs(appAuth.user);
 
   return (
     <PlaylistView
