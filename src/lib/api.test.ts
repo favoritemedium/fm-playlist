@@ -20,7 +20,11 @@ describe("API helpers", () => {
   it("does not reject authenticated users", () => {
     const auth: AppAuthResult = {
       status: "authenticated",
-      user: { name: "Test User", email: "test@favoritemedium.com" },
+      user: {
+        id: "user_123",
+        name: "Test User",
+        email: "test@favoritemedium.com",
+      },
     };
 
     expect(getAuthError(auth)).toBeNull();

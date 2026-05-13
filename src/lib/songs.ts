@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { Song, CreateSongInput } from "@/types/song";
+import type { AppUser } from "@/lib/auth";
 import { fetchAllAirtableRecords } from "./airtable";
 import {
   fetchAllSongs,
@@ -9,6 +10,7 @@ import {
   type SongInsert,
 } from "./songs-db";
 import { compareDateOnlyDesc, getDateParts, toDateOnlyString } from "./dates";
+import { syncAppUserIdentity } from "./users-db";
 import { extractYouTubeId } from "./youtube";
 
 /** Normalize a composite key for dedup comparison. Trims whitespace,
@@ -17,7 +19,12 @@ function songKey(name: string, date: string, url: string): string {
   return `${name.trim().toLowerCase()}|${toDateOnlyString(date)}|${url.trim().toLowerCase()}`;
 }
 
-export async function getAllSongs(): Promise<Song[]> {
+export async function getAllSongs(user?: AppUser): Promise<Song[]> {
+  if (user) {
+    await syncAppUserIdentity(user);
+  }
+
+  const currentUserId = user?.id ?? null;
   const airtableSongsPromise =
     fetchAllAirtableRecords().catch((err) => {
       console.error("Airtable fetch failed:", err);
@@ -28,8 +35,10 @@ export async function getAllSongs(): Promise<Song[]> {
   // of showing an empty playlist that looks valid.
   const [airtableSongs, dbSongs] = await Promise.all([
     airtableSongsPromise,
-    fetchAllSongs(),
+    fetchAllSongs(currentUserId),
   ]);
+
+  let syncedDbSongs = dbSongs;
 
   // 2. Build a set of composite keys from the DB rows we already fetched
   const existingKeys = new Set<string>();
@@ -60,6 +69,7 @@ export async function getAllSongs(): Promise<Song[]> {
       const rows: SongInsert[] = newAirtableSongs.map((song) => ({
         source: "airtable",
         airtable_record_id: song.airtableRecordId,
+        submitter_user_id: null,
         submitter_name: song.submitterName,
         submitter_email: null,
         artist_name: song.artistName,
@@ -75,13 +85,14 @@ export async function getAllSongs(): Promise<Song[]> {
       console.log(
         `[SYNC] Inserted ${insertedCount}/${newAirtableSongs.length} new Airtable rows into Postgres`
       );
+      syncedDbSongs = await fetchAllSongs(currentUserId);
     } catch (err) {
       console.error("Airtable→DB sync failed:", err);
     }
   }
 
-  // 5. Merge: DB songs + only the new Airtable songs (to avoid duplicates)
-  const merged: Song[] = [...dbSongs, ...newAirtableSongs];
+  // 5. Return DB-backed songs only. Interactions need stable `db_` IDs.
+  const merged: Song[] = [...syncedDbSongs];
 
   merged.sort((a, b) => {
     return compareDateOnlyDesc(a.submittedDate, b.submittedDate);
@@ -92,8 +103,10 @@ export async function getAllSongs(): Promise<Song[]> {
 
 export async function createSong(
   input: CreateSongInput,
-  user: { name: string; email: string }
+  user: AppUser
 ): Promise<Song> {
+  await syncAppUserIdentity(user);
+
   const youtubeUrl = input.youtubeUrl.trim();
   const description = input.description?.trim();
   const videoId = extractYouTubeId(youtubeUrl);
@@ -108,6 +121,7 @@ export async function createSong(
   return createSongRow({
     source: "app",
     airtable_record_id: null,
+    submitter_user_id: user.id,
     submitter_name: user.name,
     submitter_email: user.email,
     artist_name: null,

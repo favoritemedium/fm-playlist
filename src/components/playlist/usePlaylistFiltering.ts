@@ -14,6 +14,22 @@ interface UsePlaylistFilteringOptions {
   searchQuery: string;
   selectedYear: PlaylistFilterValue;
   selectedMonth: PlaylistFilterValue;
+  sortMode?: PlaylistSortMode;
+}
+
+export type PlaylistSortMode = "newest" | "most-liked";
+
+export function sortPlaylistSongs(
+  songs: Song[],
+  sortMode: PlaylistSortMode
+): Song[] {
+  if (sortMode !== "most-liked") return songs;
+
+  return [...songs].sort((a, b) => {
+    const likeDifference = b.likeCount - a.likeCount;
+    if (likeDifference !== 0) return likeDifference;
+    return b.submittedDate.localeCompare(a.submittedDate);
+  });
 }
 
 export function songMatchesMonthYearFilter(
@@ -34,6 +50,7 @@ export function usePlaylistFiltering({
   searchQuery,
   selectedYear,
   selectedMonth,
+  sortMode = "newest",
 }: UsePlaylistFilteringOptions) {
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
@@ -80,13 +97,13 @@ export function usePlaylistFiltering({
     [getAvailableMonthsForYear, selectedYear]
   );
 
-  const filteredSongs = useMemo(
-    () =>
-      searchMatchedSongs.filter((song) =>
-        songMatchesMonthYearFilter(song, selectedYear, selectedMonth)
-      ),
-    [searchMatchedSongs, selectedYear, selectedMonth]
-  );
+  const filteredSongs = useMemo(() => {
+    const matches = searchMatchedSongs.filter((song) =>
+      songMatchesMonthYearFilter(song, selectedYear, selectedMonth)
+    );
+
+    return sortPlaylistSongs(matches, sortMode);
+  }, [searchMatchedSongs, selectedYear, selectedMonth, sortMode]);
 
   return {
     availableYears,

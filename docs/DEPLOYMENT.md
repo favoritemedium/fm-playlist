@@ -36,6 +36,27 @@ See [../.env.example](../.env.example) for the full list.
 - **Domain allowlist:** `ALLOWED_EMAIL_DOMAIN` defaults to `favoritemedium.com`.
   Keep it aligned with Clerk's own sign-in restrictions.
 
+## Engagement Realtime
+
+Likes and comments use Server-Sent Events at `GET /api/engagement/events`.
+The app keeps one Postgres `LISTEN` connection per Node.js process and fans out
+events in-process to connected browsers. Mutating like/comment routes publish
+compact `NOTIFY` payloads through Postgres; no Redis, queue, WebSocket server,
+or sticky session setup is required for the current deployment model.
+
+Operational notes:
+
+- SSE connections are authenticated with the same Clerk/domain checks as the
+  rest of the playlist app.
+- Load balancers or reverse proxies should allow long-lived HTTP responses and
+  avoid buffering `text/event-stream` responses.
+- Each running app process opens one extra Postgres connection for engagement
+  events after the first browser subscribes.
+- In-app submitter notifications are delivered over SSE only. There is no email
+  or push notification provider in v1.
+- If the app later moves to a heavily serverless runtime, reassess this design;
+  Postgres `LISTEN` works best in long-lived Node.js processes.
+
 ## Coolify Or Managed Hosts
 
 ### Option A: Docker Compose
@@ -80,6 +101,8 @@ orchestration health checks.
   data lives in the `postgres_data` volume.
 - Watch logs for `[SYNC]` messages. They include Airtable row counts, skipped
   row counts, and inserted row counts.
+- Watch logs for engagement listener errors if SSE updates stop. Clients can
+  still use the REST APIs, but realtime updates require the Postgres listener.
 - Run `npm audit --audit-level=high` and your container scanner before
   releases.
 

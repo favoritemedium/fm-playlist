@@ -121,6 +121,7 @@ export async function fetchAllAirtableRecords(): Promise<Song[]> {
         id: `at_${record.id}`,
         source: "airtable",
         airtableRecordId: record.id,
+        submitterUserId: null,
         submitterName: fields[AIRTABLE_FIELDS.submitterName] || "Anonymous",
         submitterEmail: null,
         artistName: fields[AIRTABLE_FIELDS.artistName] || null,
@@ -131,6 +132,9 @@ export async function fetchAllAirtableRecords(): Promise<Song[]> {
         submittedDate,
         month,
         year,
+        likeCount: 0,
+        commentCount: 0,
+        userLiked: false,
       });
     }
 

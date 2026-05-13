@@ -1,44 +1,16 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getCurrentAppAuth } from "@/lib/auth";
-import type { AppAuthResult } from "@/lib/auth";
+import { authorizeApiRequest } from "@/lib/api-auth";
 import { getAllSongs, createSong } from "@/lib/songs";
-import { getAuthError, makeApiError } from "@/lib/api";
+import { makeApiError } from "@/lib/api";
 import { createSongInputSchema } from "@/lib/validation";
-
-type AuthenticatedAppAuth = Extract<
-  AppAuthResult,
-  { status: "authenticated" }
->;
-
-type AuthorizedSongsRequest =
-  | { appAuth: AuthenticatedAppAuth; response: null }
-  | { appAuth: null; response: NextResponse };
-
-async function authorizeSongsRequest(): Promise<AuthorizedSongsRequest> {
-  const appAuth = await getCurrentAppAuth();
-  const authError = getAuthError(appAuth);
-
-  if (authError) {
-    return {
-      appAuth: null,
-      response: NextResponse.json(authError.body, { status: authError.status }),
-    };
-  }
-
-  if (appAuth.status !== "authenticated") {
-    throw new Error("Unexpected auth state");
-  }
-
-  return { appAuth, response: null };
-}
 
 export async function GET() {
   try {
-    const { response } = await authorizeSongsRequest();
+    const { appAuth, response } = await authorizeApiRequest();
     if (response) return response;
 
-    const songs = await getAllSongs();
+    const songs = await getAllSongs(appAuth.user);
     return NextResponse.json(songs);
   } catch (error) {
     console.error("Failed to fetch songs:", error);
@@ -51,7 +23,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { appAuth, response } = await authorizeSongsRequest();
+    const { appAuth, response } = await authorizeApiRequest();
     if (response) return response;
 
     let body: unknown;
@@ -77,12 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = {
-      name: appAuth.user.name,
-      email: appAuth.user.email,
-    };
-
-    const song = await createSong(parsed.data, user);
+    const song = await createSong(parsed.data, appAuth.user);
     return NextResponse.json(song, { status: 201 });
   } catch (error) {
     console.error("Failed to create song:", error);

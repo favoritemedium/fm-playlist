@@ -1,16 +1,27 @@
 "use client";
 
 import { motion } from "motion/react";
+import { Heart, MessageSquare } from "lucide-react";
 import type { Song } from "@/types/song";
 import { formatDateOnlyForDisplay } from "@/lib/dates";
 import { getYouTubeEmbedUrl } from "@/lib/youtube";
+import { Button } from "@/components/ui/button";
 
 interface VideoPlayerProps {
   song: Song;
   autoplay?: boolean;
+  isLikePending: boolean;
+  onLikeToggle: (song: Song) => void;
+  onOpenEngagement: (song: Song) => void;
 }
 
-export function VideoPlayer({ song, autoplay = false }: VideoPlayerProps) {
+export function VideoPlayer({
+  song,
+  autoplay = false,
+  isLikePending,
+  onLikeToggle,
+  onOpenEngagement,
+}: VideoPlayerProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -44,6 +55,34 @@ export function VideoPlayer({ song, autoplay = false }: VideoPlayerProps) {
         )}
         <div className="text-sm text-muted-foreground font-semibold">
           Added {formatDateOnlyForDisplay(song.submittedDate)}
+        </div>
+        <div className="flex flex-wrap items-center gap-2 pt-2">
+          <Button
+            type="button"
+            disabled={isLikePending}
+            onClick={() => onLikeToggle(song)}
+            title={song.userLiked ? "Unlike" : "Like"}
+            className={
+              song.userLiked
+                ? "bg-primary hover:bg-primary/90 text-white font-bold"
+                : "bg-white text-foreground border-2 border-border hover:border-primary font-bold"
+            }
+          >
+            <Heart
+              className="size-4"
+              fill={song.userLiked ? "currentColor" : "none"}
+            />
+            {song.likeCount}
+          </Button>
+          <Button
+            type="button"
+            onClick={() => onOpenEngagement(song)}
+            title="Open comments"
+            className="bg-white text-foreground border-2 border-border hover:border-secondary font-bold"
+          >
+            <MessageSquare className="size-4 text-secondary" />
+            {song.commentCount}
+          </Button>
         </div>
       </div>
     </motion.div>
