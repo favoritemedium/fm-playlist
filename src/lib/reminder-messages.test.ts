@@ -27,10 +27,14 @@ describe("reminder messages", () => {
   it("builds the Monday submission prompt", () => {
     expect(buildMondayReminderMessage("https://playlist.example.com/")).toBe(
       [
-        "🌟 Happy Monday! Let's kick off the week with some great tunes!",
-        "🎵 Share a song you've been loving on FM Playlist:",
-        "https://playlist.example.com",
-        "✨ Have a fantastic week ahead!",
+        "🌟 *Happy Monday!*",
+        "",
+        "Let's kick off the week with a fresh round of songs.",
+        "",
+        "* Share one track you've been loving",
+        "* <https://playlist.example.com|Open FM Playlist>",
+        "",
+        "_Have a fantastic week ahead!_",
       ].join("\n")
     );
   });
@@ -46,11 +50,15 @@ describe("reminder messages", () => {
       )
     ).toBe(
       [
-        "🎉 Happy Friday! Thanks to everyone who shared their favorite tracks this week:",
-        "Ada and Grace",
-        "🎶 Check out the playlist and enjoy the vibes:",
-        "https://playlist.example.com",
-        "🌞 Have a wonderful weekend!",
+        "🎉 *Happy Friday!*",
+        "",
+        "Thanks for keeping the playlist moving this week:",
+        "* Ada",
+        "* Grace",
+        "",
+        "<https://playlist.example.com|Listen to this week's FM Playlist>",
+        "",
+        "_Have a wonderful weekend!_",
       ].join("\n")
     );
   });
@@ -58,9 +66,13 @@ describe("reminder messages", () => {
   it("builds the Friday no-submitters nudge", () => {
     expect(buildFridayNoSubmittersMessage("https://playlist.example.com")).toBe(
       [
+        "🎧 *Happy Friday!*",
+        "",
         "No new songs landed in the playlist this week.",
-        "Start the next round with a track you want the team to hear:",
-        "https://playlist.example.com",
+        "",
+        "<https://playlist.example.com|Add a track to start next week's FM Playlist>",
+        "",
+        "_Have a wonderful weekend!_",
       ].join("\n")
     );
   });
