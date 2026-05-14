@@ -81,6 +81,28 @@ BEGIN
   END IF;
 END $$;
 
+CREATE TABLE IF NOT EXISTS reminder_runs (
+  id                   SERIAL PRIMARY KEY,
+  job_name             TEXT        NOT NULL,
+  idempotency_key      TEXT        NOT NULL UNIQUE,
+  period_start         DATE        NOT NULL,
+  period_end           DATE        NOT NULL,
+  status               TEXT        NOT NULL CONSTRAINT reminder_runs_status_check CHECK (status IN ('started', 'sent', 'failed')),
+  message_text         TEXT        NOT NULL,
+  google_chat_response JSONB,
+  error_message        TEXT,
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+  sent_at              TIMESTAMPTZ,
+  updated_at           TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'reminder_runs_status_check') THEN
+    ALTER TABLE reminder_runs ADD CONSTRAINT reminder_runs_status_check CHECK (status IN ('started', 'sent', 'failed')) NOT VALID;
+  END IF;
+END $$;
+
 CREATE INDEX IF NOT EXISTS app_users_email_idx
   ON app_users (lower(email));
 
@@ -104,6 +126,11 @@ CREATE INDEX IF NOT EXISTS song_comments_user_created_idx
   ON song_comments (user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS song_comments_parent_comment_id_idx
   ON song_comments (parent_comment_id);
+
+CREATE INDEX IF NOT EXISTS reminder_runs_job_created_idx
+  ON reminder_runs (job_name, created_at DESC);
+CREATE INDEX IF NOT EXISTS reminder_runs_period_idx
+  ON reminder_runs (job_name, period_start, period_end);
 
 CREATE OR REPLACE FUNCTION app_users_set_updated_at()
 RETURNS TRIGGER AS $$
@@ -143,3 +170,16 @@ DROP TRIGGER IF EXISTS song_comments_set_updated_at ON song_comments;
 CREATE TRIGGER song_comments_set_updated_at
   BEFORE UPDATE ON song_comments
   FOR EACH ROW EXECUTE FUNCTION song_comments_set_updated_at();
+
+CREATE OR REPLACE FUNCTION reminder_runs_set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS reminder_runs_set_updated_at ON reminder_runs;
+CREATE TRIGGER reminder_runs_set_updated_at
+  BEFORE UPDATE ON reminder_runs
+  FOR EACH ROW EXECUTE FUNCTION reminder_runs_set_updated_at();

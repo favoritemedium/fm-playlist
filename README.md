@@ -9,6 +9,7 @@ Postgres host.
 - **Google sign-in** via Clerk (restricted to `@favoritemedium.com`)
 - **Monthly playlists** — browse by year and month
 - **Add tracks** — paste a YouTube URL with an optional description
+- **Google Chat reminders** — scheduled prompts and weekly submitter thanks
 - **Search** — filter by submitter, title, artist, or description
 - **Airtable -> Postgres sync** — optional legacy import, runs on page load
 - **Responsive** — works on mobile, tablet, and desktop
@@ -52,6 +53,10 @@ See [.env.example](.env.example) for the full list.
 | `DATABASE_URL` | ✔ (non-compose) | Full Postgres connection string |
 | `AIRTABLE_API_TOKEN` / `AIRTABLE_BASE_ID` | — | Enable Airtable sync |
 | `ALLOWED_EMAIL_DOMAIN` | — | Server-side fallback allowlist. Defaults to `favoritemedium.com` |
+| `SERVICE_URL_APP` | reminders | Public app URL included in Google Chat messages |
+| `GOOGLE_CHAT_WEBHOOK_URL` | reminders | Google Chat Space webhook URL |
+| `REMINDER_CRON_SECRET` | reminders | Bearer token required by scheduled reminder endpoints |
+| `REMINDER_TIME_ZONE` | — | Reminder business timezone. Defaults to `Asia/Singapore` |
 
 Never commit real environment files. `.env`, `.env.local`, and `.env.*.local`
 are ignored, and Docker builds also exclude env files from the build context.
@@ -72,6 +77,9 @@ npm run test    # Run unit tests
 - `GET /api/health` is public and returns `{"ok": true}` for orchestration.
 - `GET /api/songs` and `POST /api/songs` require an authenticated Clerk user
   from the allowed email domain.
+- `GET` or `POST /api/reminders/monday` and `/api/reminders/friday` require
+  `Authorization: Bearer <REMINDER_CRON_SECRET>` and send Google Chat messages
+  when reminder env vars are configured.
 - Postgres is required and is the source of truth. If Postgres is unavailable,
   the app surfaces an error instead of pretending the playlist is empty.
 - Airtable is optional. If Airtable credentials are absent or Airtable fails,
@@ -91,12 +99,14 @@ src/
     page.tsx                # Home (server component)
     api/songs/route.ts      # Songs API (GET all, POST new)
     api/health/route.ts     # Unauthenticated health check
+    api/reminders/          # Secret-protected Google Chat reminder endpoints
   components/               # UI, playlist, layout, auth
   lib/
     auth.ts                 # Clerk user mapping and domain checks
     airtable.ts             # Airtable API (server-only)
     db.ts                   # pg.Pool + ensureSchema()
     songs-db.ts             # Postgres queries for songs
+    reminders*.ts           # Reminder scheduling, messages, Google Chat, DB helpers
     songs.ts                # Unified data layer (Airtable + DB)
     youtube.ts              # YouTube URL utilities
     constants.ts            # Shared constants

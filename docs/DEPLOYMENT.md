@@ -35,6 +35,9 @@ See [../.env.example](../.env.example) for the full list.
   them to run from Postgres only.
 - **Domain allowlist:** `ALLOWED_EMAIL_DOMAIN` defaults to `favoritemedium.com`.
   Keep it aligned with Clerk's own sign-in restrictions.
+- **Google Chat reminders:** `SERVICE_URL_APP`, `GOOGLE_CHAT_WEBHOOK_URL`, and
+  `REMINDER_CRON_SECRET` are required only when scheduled reminders are enabled.
+  `REMINDER_TIME_ZONE` defaults to `Asia/Singapore`.
 
 ## Engagement Realtime
 
@@ -57,6 +60,30 @@ Operational notes:
 - If the app later moves to a heavily serverless runtime, reassess this design;
   Postgres `LISTEN` works best in long-lived Node.js processes.
 
+## Google Chat Reminders
+
+Reminder jobs are HTTP endpoints protected by `REMINDER_CRON_SECRET`. Configure
+an external scheduler in Singapore time:
+
+| Job | Schedule | Endpoint |
+|---|---|---|
+| Monday song prompt | `0 9 * * 1` | `POST /api/reminders/monday` |
+| Friday submitter thanks | `0 17 * * 5` | `POST /api/reminders/friday` |
+
+Each request must include:
+
+```text
+Authorization: Bearer <REMINDER_CRON_SECRET>
+```
+
+The routes also accept `GET` for schedulers that cannot send `POST` requests,
+but `POST` is preferred. Friday messages thank everyone with songs whose
+`submitted_date` falls in the last seven local dates including Friday. If no
+one submitted, the app sends a gentle nudge instead.
+
+Reminder sends are recorded in the `reminder_runs` table with an idempotency
+key, so retries for the same job/window do not send duplicate Space messages.
+
 ## Coolify Or Managed Hosts
 
 ### Option A: Docker Compose
@@ -71,9 +98,11 @@ Operational notes:
 2. Create a Docker build resource using the root `Dockerfile`.
 3. Set `DATABASE_URL`, Clerk keys, and optional Airtable values.
 4. Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` as a build variable too.
-5. Assign a domain and deploy.
+5. Set `SERVICE_URL_APP` to the public app URL. In Coolify this value is often
+  already available as the app service URL.
+6. Assign a domain and deploy.
 
-`ensureSchema()` creates or updates the `songs` table on first access.
+`ensureSchema()` creates or updates the app tables on first access.
 
 ## Clerk Production Setup
 
@@ -97,6 +126,8 @@ orchestration health checks.
   build context rules.
 - Rotate Clerk or Airtable credentials if they are copied into a shared place,
   committed by accident, or exposed by build artifacts.
+- Rotate `GOOGLE_CHAT_WEBHOOK_URL` if it is copied into a shared place,
+  committed by accident, or posted in chat/tickets.
 - Back up Postgres before destructive maintenance. For compose deployments,
   data lives in the `postgres_data` volume.
 - Watch logs for `[SYNC]` messages. They include Airtable row counts, skipped
@@ -124,5 +155,11 @@ orchestration health checks.
   outages should surface as app/API errors.
 - **Build cannot find Clerk key** - set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` at
   build time, not only runtime.
+- **Reminder cron returns 401** - confirm the scheduler sends
+  `Authorization: Bearer <REMINDER_CRON_SECRET>`.
+- **Reminder cron returns 500** - set `SERVICE_URL_APP`,
+  `GOOGLE_CHAT_WEBHOOK_URL`, and `REMINDER_CRON_SECRET` in the app runtime env.
+- **Reminder cron returns 502** - Google Chat rejected the webhook call. Rotate
+  or recreate the webhook if the URL is expired or was exposed.
 - **Clerk logs `secure-context: false`** - the app is being served over HTTP.
   Configure TLS and use the HTTPS URL for deployed Clerk auth flows.

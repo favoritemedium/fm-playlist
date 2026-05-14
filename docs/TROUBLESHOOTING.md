@@ -58,6 +58,29 @@ Accepted formats are:
 
 The video ID must be exactly 11 characters.
 
+## Google Chat Reminders
+
+**Reminder endpoint returns 401**
+
+The request is missing the cron bearer token or has the wrong value. Configure
+the scheduler to send `Authorization: Bearer <REMINDER_CRON_SECRET>`.
+
+**Reminder endpoint returns 500**
+
+The reminder runtime configuration is incomplete. Set `SERVICE_URL_APP`,
+`GOOGLE_CHAT_WEBHOOK_URL`, and `REMINDER_CRON_SECRET` in the deployed app env.
+
+**Reminder endpoint returns 502**
+
+Google Chat rejected the webhook call. Confirm the Space webhook still exists,
+then rotate or recreate `GOOGLE_CHAT_WEBHOOK_URL` if the URL was exposed.
+
+**Cron retries do not send another message**
+
+The app records reminder sends in `reminder_runs` and skips duplicate attempts
+for the same job and date window. Inspect app logs and `reminder_runs` if a job
+was expected to send again.
+
 ## Docker And Database
 
 **Reset local database**
@@ -84,4 +107,6 @@ docker compose logs -f app
 - `npm run lint`: check framework, accessibility, and unused-code issues.
 - `npm run typecheck`: check TypeScript errors, especially route/helper types.
 - `npm run test`: check focused unit tests for parsing, validation, and dates.
+- `npm run test`: check focused unit tests for parsing, validation, dates, and
+	reminder message/client helpers.
 - `npm run build`: check runtime configuration required by Next.js and Clerk.

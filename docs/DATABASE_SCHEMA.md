@@ -113,6 +113,36 @@ Existing volumes receive these checks through `ensureSchema()` with `NOT VALID`
 constraints. That avoids rejecting old rows during startup while enforcing new
 writes. Fresh databases get the same constraints at table creation time.
 
+## `reminder_runs` Table
+
+`reminder_runs` stores Google Chat reminder attempts and prevents duplicate
+messages when an external scheduler retries the same job/date window.
+
+| Column | Type | Null | Description |
+|---|---|---|---|
+| `id` | `SERIAL PK` | No | Auto-increment primary key |
+| `job_name` | `TEXT` | No | Reminder job, such as `monday_song_reminder` |
+| `idempotency_key` | `TEXT UNIQUE` | No | Stable key for the job/date window |
+| `period_start` | `DATE` | No | Inclusive date-only window start |
+| `period_end` | `DATE` | No | Exclusive date-only window end |
+| `status` | `TEXT` | No | `started`, `sent`, or `failed` |
+| `message_text` | `TEXT` | No | Google Chat message body that was attempted |
+| `google_chat_response` | `JSONB` | Yes | Status/body summary from Google Chat |
+| `error_message` | `TEXT` | Yes | Failure detail for retry/debugging |
+| `created_at` | `TIMESTAMPTZ` | No | Auto-populated |
+| `sent_at` | `TIMESTAMPTZ` | Yes | Set when Google Chat accepts the message |
+| `updated_at` | `TIMESTAMPTZ` | No | Auto-updated by trigger |
+
+Indexes:
+
+- `reminder_runs_job_created_idx` on `(job_name, created_at DESC)`
+- `reminder_runs_period_idx` on `(job_name, period_start, period_end)`
+
+Constraints:
+
+- `idempotency_key` is unique, so successful scheduler retries are skipped.
+- `status` must be `started`, `sent`, or `failed`.
+
 ## Data Flow
 
 ### Airtable To Postgres
@@ -152,6 +182,18 @@ signed-in user's email matches `submitter_email`.
 
 Descriptions are limited to 500 characters. Dates are normalized to
 `YYYY-MM-DD`, and `month` and `year` are derived from that same value.
+
+### Google Chat Reminders
+
+1. An external scheduler calls `/api/reminders/monday` at Monday 9:00 AM or
+   `/api/reminders/friday` at Friday 5:00 PM in `Asia/Singapore`.
+2. The route validates `Authorization: Bearer <REMINDER_CRON_SECRET>`.
+3. Monday builds a song-submission prompt with `SERVICE_URL_APP`.
+4. Friday queries `songs.submitted_date` for the last seven local dates,
+   groups all non-empty `submitter_name` values, and builds a thank-you list.
+5. If no one submitted, Friday sends a gentle nudge instead.
+6. The app reserves a `reminder_runs` row before sending and marks it `sent` or
+   `failed` after the Google Chat webhook call.
 
 ## Airtable Fields
 
