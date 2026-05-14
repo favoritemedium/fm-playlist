@@ -20,9 +20,10 @@ export function formatSubmitterNames(submitters: SubmitterSummary[]): string {
 export function buildMondayReminderMessage(appBaseUrl: string): string {
   const url = normalizeAppBaseUrl(appBaseUrl);
   return [
-    "Good morning! New week, new picks.",
-    "Share one song you have been replaying on FM Playlist:",
+    "🌟 Happy Monday! Let's kick off the week with some great tunes!",
+    "🎵 Share a song you've been loving on FM Playlist:",
     url,
+    "✨ Have a fantastic week ahead!",
   ].join("\n");
 }
 
@@ -38,9 +39,11 @@ export function buildFridayThanksMessage(
   }
 
   return [
-    `Thanks for keeping the playlist moving this week: ${names}.`,
-    "Listen to the latest picks here:",
+    "🎉 Happy Friday! Thanks to everyone who shared their favorite tracks this week:",
+    names,
+    "🎶 Check out the playlist and enjoy the vibes:",
     url,
+    "🌞 Have a wonderful weekend!",
   ].join("\n");
 }
 

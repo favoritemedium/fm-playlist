@@ -27,9 +27,10 @@ describe("reminder messages", () => {
   it("builds the Monday submission prompt", () => {
     expect(buildMondayReminderMessage("https://playlist.example.com/")).toBe(
       [
-        "Good morning! New week, new picks.",
-        "Share one song you have been replaying on FM Playlist:",
+        "🌟 Happy Monday! Let's kick off the week with some great tunes!",
+        "🎵 Share a song you've been loving on FM Playlist:",
         "https://playlist.example.com",
+        "✨ Have a fantastic week ahead!",
       ].join("\n")
     );
   });
@@ -45,9 +46,11 @@ describe("reminder messages", () => {
       )
     ).toBe(
       [
-        "Thanks for keeping the playlist moving this week: Ada and Grace.",
-        "Listen to the latest picks here:",
+        "🎉 Happy Friday! Thanks to everyone who shared their favorite tracks this week:",
+        "Ada and Grace",
+        "🎶 Check out the playlist and enjoy the vibes:",
         "https://playlist.example.com",
+        "🌞 Have a wonderful weekend!",
       ].join("\n")
     );
   });

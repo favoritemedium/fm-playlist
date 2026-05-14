@@ -20,8 +20,8 @@ ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 
-# wget is used by the compose healthcheck
-RUN apk add --no-cache wget
+# wget and curl are used by the compose healthcheck and cron jobs
+RUN apk add --no-cache wget curl
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
