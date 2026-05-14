@@ -17,13 +17,25 @@ export function formatSubmitterNames(submitters: SubmitterSummary[]): string {
   return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }
 
+function formatSubmitterBulletList(submitters: SubmitterSummary[]): string {
+  return submitters
+    .map((submitter) => submitter.name.trim())
+    .filter(Boolean)
+    .map((name) => `* ${name}`)
+    .join("\n");
+}
+
 export function buildMondayReminderMessage(appBaseUrl: string): string {
   const url = normalizeAppBaseUrl(appBaseUrl);
   return [
-    "🌟 Happy Monday! Let's kick off the week with some great tunes!",
-    "🎵 Share a song you've been loving on FM Playlist:",
-    url,
-    "✨ Have a fantastic week ahead!",
+    "🌟 *Happy Monday!*",
+    "",
+    "Let's kick off the week with a fresh round of songs.",
+    "",
+    "* Share one track you've been loving",
+    `* <${url}|Open FM Playlist>`,
+    "",
+    "_Have a fantastic week ahead!_",
   ].join("\n");
 }
 
@@ -32,26 +44,33 @@ export function buildFridayThanksMessage(
   appBaseUrl: string
 ): string {
   const url = normalizeAppBaseUrl(appBaseUrl);
-  const names = formatSubmitterNames(submitters);
+  const submitterList = formatSubmitterBulletList(submitters);
 
-  if (!names) {
+  if (!submitterList) {
     return buildFridayNoSubmittersMessage(url);
   }
 
   return [
-    "🎉 Happy Friday! Thanks to everyone who shared their favorite tracks this week:",
-    names,
-    "🎶 Check out the playlist and enjoy the vibes:",
-    url,
-    "🌞 Have a wonderful weekend!",
+    "🎉 *Happy Friday!*",
+    "",
+    "Thanks for keeping the playlist moving this week:",
+    submitterList,
+    "",
+    `<${url}|Listen to this week's FM Playlist>`,
+    "",
+    "_Have a wonderful weekend!_",
   ].join("\n");
 }
 
 export function buildFridayNoSubmittersMessage(appBaseUrl: string): string {
   const url = normalizeAppBaseUrl(appBaseUrl);
   return [
+    "🎧 *Happy Friday!*",
+    "",
     "No new songs landed in the playlist this week.",
-    "Start the next round with a track you want the team to hear:",
-    url,
+    "",
+    `<${url}|Add a track to start next week's FM Playlist>`,
+    "",
+    "_Have a wonderful weekend!_",
   ].join("\n");
 }
