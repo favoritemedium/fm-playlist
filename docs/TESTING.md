@@ -19,6 +19,7 @@ Unit tests cover:
 - Date-only normalization and display formatting
 - Song submission validation
 - API auth/error helper behavior
+- Reminder date-window, message, cron auth, and Google Chat client behavior
 
 Test files live beside the code they cover as `*.test.ts` files.
 
@@ -45,6 +46,11 @@ With a running app, verify:
 - `POST /api/songs` rejects malformed JSON, invalid YouTube URLs, and
   forbidden-domain users.
 - Allowed users can submit a valid YouTube URL.
+- `POST /api/reminders/monday` rejects missing or invalid cron bearer tokens.
+- `POST /api/reminders/monday` sends one Google Chat message and skips a
+  duplicate retry for the same date window.
+- `POST /api/reminders/friday` lists recent submitter names, and sends the
+  no-submitters nudge when the seven-date window is empty.
 
 ## CI
 

@@ -20,6 +20,8 @@ Required secrets and private values:
 - `CLERK_SECRET_KEY`
 - `POSTGRES_PASSWORD` or `DATABASE_URL`
 - `AIRTABLE_API_TOKEN`, when Airtable sync is enabled
+- `GOOGLE_CHAT_WEBHOOK_URL`, when Google Chat reminders are enabled
+- `REMINDER_CRON_SECRET`, when scheduled reminder endpoints are enabled
 
 Local `.env` files are ignored by Git and Docker build context rules. Leave
 `.env.example` as placeholders only.
@@ -31,6 +33,16 @@ secrets; do not hardcode Clerk keys in workflow YAML.
 Rotate provider tokens when they are committed, copied into a shared channel,
 attached to a ticket, or discovered in a build artifact. Rotation happens in
 Clerk, Airtable, and the deployment host, not in code.
+
+Google Chat webhook URLs are bearer credentials. Do not paste production
+webhook URLs into source files, tickets, logs, or shared chat messages. If a
+webhook URL is exposed, revoke or recreate it in Google Chat and update the
+deployment environment variable.
+
+Scheduled reminder endpoints use `Authorization: Bearer <REMINDER_CRON_SECRET>`
+instead of Clerk, because cron calls are not user sessions. Use a long random
+secret, keep it out of client-visible variables, and rotate it if scheduler
+configuration is shared too broadly.
 
 ## Input Validation
 
