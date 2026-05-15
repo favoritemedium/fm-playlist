@@ -7,8 +7,10 @@ Postgres host.
 ## Features
 
 - **Google sign-in** via Clerk (restricted to `@favoritemedium.com`)
-- **Monthly playlists** — browse by year and month
+- **Monthly playlists** — browse by year and month, then sort by newest or most liked
 - **Add tracks** — paste a YouTube URL with an optional description
+- **Likes and comments** — like songs, add comments, and reply one level deep
+- **Realtime engagement** — live like/comment count updates and in-app submitter notifications
 - **Google Chat reminders** — scheduled prompts and weekly submitter thanks
 - **Search** — filter by submitter, title, artist, or description
 - **Airtable -> Postgres sync** — optional legacy import, runs on page load
@@ -77,6 +79,14 @@ npm run test    # Run unit tests
 - `GET /api/health` is public and returns `{"ok": true}` for orchestration.
 - `GET /api/songs` and `POST /api/songs` require an authenticated Clerk user
   from the allowed email domain.
+- `GET`, `POST`, and `DELETE /api/songs/[songId]/likes` require the same
+  allowed-domain Clerk auth and return the current song engagement summary.
+- `GET` and `POST /api/songs/[songId]/comments` plus `PATCH` and
+  `DELETE /api/comments/[commentId]` require the same auth, support one level
+  of replies, limit comment bodies to 500 characters, and enforce a
+  5-comments-per-minute rate limit.
+- `GET /api/engagement/events` is an authenticated Server-Sent Events stream
+  used for live engagement counts and submitter comment notifications.
 - `GET` or `POST /api/reminders/monday` and `/api/reminders/friday` require
   `Authorization: Bearer <REMINDER_CRON_SECRET>` and send Google Chat messages
   when reminder env vars are configured.
@@ -98,13 +108,20 @@ src/
   app/
     page.tsx                # Home (server component)
     api/songs/route.ts      # Songs API (GET all, POST new)
+    api/songs/[songId]/     # Likes and comments APIs per song
+    api/comments/[commentId]/route.ts # Comment edit/delete API
+    api/engagement/events/route.ts    # Authenticated SSE engagement stream
     api/health/route.ts     # Unauthenticated health check
     api/reminders/          # Secret-protected Google Chat reminder endpoints
   components/               # UI, playlist, layout, auth
+    playlist/EngagementDialog.tsx # Likes/comments UI
+    playlist/useEngagementEvents.ts # Client SSE subscription hook
   lib/
     auth.ts                 # Clerk user mapping and domain checks
     airtable.ts             # Airtable API (server-only)
     db.ts                   # pg.Pool + ensureSchema()
+    engagement-db.ts        # Likes/comments queries and rules
+    engagement-events.ts    # Postgres LISTEN/NOTIFY fan-out for SSE
     songs-db.ts             # Postgres queries for songs
     reminders*.ts           # Reminder scheduling, messages, Google Chat, DB helpers
     songs.ts                # Unified data layer (Airtable + DB)

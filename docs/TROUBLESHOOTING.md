@@ -58,6 +58,29 @@ Accepted formats are:
 
 The video ID must be exactly 11 characters.
 
+## Engagement Issues
+
+**Like or comment actions fail with 401 or 403**
+
+The engagement routes use the same Clerk plus `ALLOWED_EMAIL_DOMAIN` checks as
+the main playlist API. Reauthenticate with an allowed account, then retry.
+
+**Comment edit or delete fails**
+
+Only the comment author can update or delete a comment. Confirm the current
+account matches the original author.
+
+**Comment creation returns a rate-limit error**
+
+The app allows up to 5 comments per user per rolling minute across top-level
+comments and replies. Wait a minute, then retry.
+
+**Likes, comments, or submitter notifications do not update live**
+
+Check app logs for engagement listener errors, and confirm your reverse proxy
+does not buffer or close `text/event-stream` responses. REST reads and writes
+can still work even if the realtime stream is unhealthy.
+
 ## Google Chat Reminders
 
 **Reminder endpoint returns 401**
@@ -106,7 +129,6 @@ docker compose logs -f app
 
 - `npm run lint`: check framework, accessibility, and unused-code issues.
 - `npm run typecheck`: check TypeScript errors, especially route/helper types.
-- `npm run test`: check focused unit tests for parsing, validation, and dates.
 - `npm run test`: check focused unit tests for parsing, validation, dates, and
-	reminder message/client helpers.
+  reminder message/client helpers.
 - `npm run build`: check runtime configuration required by Next.js and Clerk.

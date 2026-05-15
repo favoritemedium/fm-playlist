@@ -9,6 +9,10 @@ Clerk handles authentication. The app enforces authorization in server code:
 - `src/app/page.tsx` blocks the playlist UI for unauthenticated or forbidden
   users.
 - `src/app/api/songs/route.ts` protects both `GET` and `POST`.
+- `src/app/api/songs/[songId]/likes/route.ts`,
+  `src/app/api/songs/[songId]/comments/route.ts`,
+  `src/app/api/comments/[commentId]/route.ts`, and
+  `src/app/api/engagement/events/route.ts` use the same server-side auth gate.
 - `GET /api/health` is intentionally public for orchestrators.
 
 Keep Clerk dashboard restrictions aligned with `ALLOWED_EMAIL_DOMAIN`.
@@ -50,6 +54,11 @@ configuration is shared too broadly.
 - YouTube URLs are parsed with `URL` and accepted only for supported YouTube
   hosts and paths.
 - Descriptions are trimmed and limited to 500 characters.
+- Comment bodies are trimmed, limited to 500 characters, and checked for
+  one-level reply structure.
+- Comment creation is rate-limited to 5 comments per user per minute.
+- Comment edits and deletes require comment ownership and reject cross-user
+  mutations.
 - DB constraints enforce source, month, year, and YouTube video ID validity for
   new writes.
 
@@ -64,6 +73,9 @@ headers:
 - `Permissions-Policy: camera=(), microphone=(), geolocation=()`
 
 Use HTTPS in production through the deployment host.
+
+Reverse proxies should also preserve long-lived `text/event-stream` responses
+for the authenticated engagement SSE route.
 
 ## Dependency And Container Checks
 

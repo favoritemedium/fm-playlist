@@ -47,6 +47,12 @@ events in-process to connected browsers. Mutating like/comment routes publish
 compact `NOTIFY` payloads through Postgres; no Redis, queue, WebSocket server,
 or sticky session setup is required for the current deployment model.
 
+The stream currently emits two event types:
+
+- `song_engagement_updated` for like/comment count changes on a song.
+- `song_comment_notification` for new comments, filtered so only the song
+  submitter receives the notification event.
+
 Operational notes:
 
 - SSE connections are authenticated with the same Clerk/domain checks as the
@@ -117,7 +123,8 @@ key, so retries for the same job/window do not send duplicate Space messages.
 `GET /api/health` is public and returns `{"ok": true}`. Docker Compose uses it
 as the app container liveness check.
 
-`GET /api/songs` and `POST /api/songs` are protected and should not be used as
+`GET /api/songs`, the likes/comments routes, the comment mutation route, and
+`GET /api/engagement/events` are protected and should not be used as
 orchestration health checks.
 
 ## Operations

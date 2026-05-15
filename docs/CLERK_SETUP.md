@@ -1,7 +1,7 @@
 # Clerk Setup Guide
 
 The app uses `@clerk/nextjs` with the App Router, `ClerkProvider`,
-`clerkMiddleware`, `currentUser`, `SignInButton`, `SignOutButton`, `Show`, and
+`clerkMiddleware`, `currentUser`, `SignInButton`, `SignOutButton`, and
 `useAuth`.
 
 ## 1. Create Clerk Application
@@ -24,9 +24,9 @@ The app uses `@clerk/nextjs` with the App Router, `ClerkProvider`,
 Configure Clerk's sign-up or sign-in restrictions so only
 `@favoritemedium.com` accounts can create or use accounts for this app.
 
-The app also checks `ALLOWED_EMAIL_DOMAIN` on the server for both page access
-and `/api/songs`. Keep the Clerk dashboard restriction and the environment
-variable aligned.
+The app also checks `ALLOWED_EMAIL_DOMAIN` on the server for page access,
+playlist APIs, engagement APIs, and the authenticated SSE endpoint. Keep the
+Clerk dashboard restriction and the environment variable aligned.
 
 ## 4. Get API Keys
 
@@ -71,6 +71,10 @@ state immediately.
   allowed email domain.
 - `src/app/page.tsx` shows sign-in, forbidden-account, or playlist states.
 - `src/app/api/songs/route.ts` explicitly protects both reads and writes.
+- `src/app/api/songs/[songId]/likes/route.ts`,
+  `src/app/api/songs/[songId]/comments/route.ts`,
+  `src/app/api/comments/[commentId]/route.ts`, and
+  `src/app/api/engagement/events/route.ts` use the same allowed-domain auth.
 
 ## 8. Migration Notes
 
