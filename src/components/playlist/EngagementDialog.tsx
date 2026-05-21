@@ -29,6 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { setCachedLikers } from "@/lib/likers-cache";
 
 interface EngagementDialogProps {
   song: Song | null;
@@ -207,7 +208,7 @@ function CommentEntry({
                 type="button"
                 aria-label="Edit comment"
                 title="Edit comment"
-                onClick={() => setIsEditing(true)}
+                onClick={() => void setIsEditing(true)}
                 className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               >
                 <Edit2 className="size-4" />
@@ -268,6 +269,7 @@ export function EngagementDialog({
       ]);
 
       setLikers(likesData.likers);
+      setCachedLikers(song.id, likesData.likers);
       setComments(commentsData.comments);
       onSummaryChange(commentsData.summary);
     } catch (err) {

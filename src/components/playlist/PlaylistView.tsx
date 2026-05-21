@@ -35,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { updateLikerInCache } from "@/lib/likers-cache";
 
 interface PlaylistViewProps {
   initialSongs: Song[];
@@ -242,6 +243,20 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
         likeCount: Math.max(0, song.likeCount + (nextLiked ? 1 : -1)),
         userLiked: nextLiked,
       });
+
+      if (user) {
+        updateLikerInCache(
+          song.id,
+          {
+            id: user.id || "",
+            name: user.name || "",
+            email: user.email || "",
+            picture: user.picture || null,
+          },
+          nextLiked
+        );
+      }
+
       setLikePending(song.id, true);
       setEngagementError(null);
 
@@ -265,6 +280,18 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
         applyEngagementSummary((data as SummaryResponse).summary);
       } catch (err) {
         applyEngagementSummary(previousSummary);
+        if (user) {
+          updateLikerInCache(
+            song.id,
+            {
+              id: user.id || "",
+              name: user.name || "",
+              email: user.email || "",
+              picture: user.picture || null,
+            },
+            !nextLiked
+          );
+        }
         setEngagementError(
           err instanceof Error ? err.message : "Failed to update like"
         );
@@ -272,7 +299,7 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
         setLikePending(song.id, false);
       }
     },
-    [applyEngagementSummary, pendingLikeSongIds, setLikePending]
+    [applyEngagementSummary, pendingLikeSongIds, setLikePending, user]
   );
 
   useEffect(() => {

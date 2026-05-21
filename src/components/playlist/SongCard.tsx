@@ -4,6 +4,7 @@ import { Heart, MessageSquare, Play } from "lucide-react";
 import Image from "next/image";
 import type { Song } from "@/types/song";
 import { getYouTubeThumbnailUrl } from "@/lib/youtube";
+import { LikesTooltip } from "./LikesTooltip";
 
 interface SongCardProps {
   song: Song;
@@ -33,14 +34,16 @@ export function SongCard({ song, isActive, index, onClick }: SongCardProps) {
         className="w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute top-2 left-2 flex items-center gap-1.5">
-        <span className="inline-flex min-w-10 items-center justify-center gap-1 rounded-full bg-black/80 px-2 py-1 text-[11px] font-black text-white">
-          <Heart
-            className="size-3"
-            fill={song.userLiked ? "currentColor" : "none"}
-          />
-          {song.likeCount}
-        </span>
+      <div className="absolute top-2 left-2 flex items-center gap-1.5 z-20">
+        <LikesTooltip songId={song.id} likeCount={song.likeCount}>
+          <span className="inline-flex min-w-10 items-center justify-center gap-1 rounded-full bg-black/80 px-2 py-1 text-[11px] font-black text-white">
+            <Heart
+              className="size-3"
+              fill={song.userLiked ? "currentColor" : "none"}
+            />
+            {song.likeCount}
+          </span>
+        </LikesTooltip>
         {song.commentCount > 0 && (
           <span className="inline-flex min-w-10 items-center justify-center gap-1 rounded-full bg-black/80 px-2 py-1 text-[11px] font-black text-white">
             <MessageSquare className="size-3" />
