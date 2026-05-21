@@ -6,6 +6,7 @@ import type { Song } from "@/types/song";
 import { formatDateOnlyForDisplay } from "@/lib/dates";
 import { getYouTubeEmbedUrl } from "@/lib/youtube";
 import { Button } from "@/components/ui/button";
+import { LikesTooltip } from "./LikesTooltip";
 
 interface VideoPlayerProps {
   song: Song;
@@ -57,23 +58,25 @@ export function VideoPlayer({
           Added {formatDateOnlyForDisplay(song.submittedDate)}
         </div>
         <div className="flex flex-wrap items-center gap-2 pt-2">
-          <Button
-            type="button"
-            disabled={isLikePending}
-            onClick={() => onLikeToggle(song)}
-            title={song.userLiked ? "Unlike" : "Like"}
-            className={
-              song.userLiked
-                ? "bg-primary hover:bg-primary/90 text-white font-bold"
-                : "bg-white text-foreground border-2 border-border hover:border-primary font-bold"
-            }
-          >
-            <Heart
-              className="size-4"
-              fill={song.userLiked ? "currentColor" : "none"}
-            />
-            {song.likeCount}
-          </Button>
+          <LikesTooltip songId={song.id} likeCount={song.likeCount}>
+            <Button
+              type="button"
+              disabled={isLikePending}
+              onClick={() => onLikeToggle(song)}
+              title={song.userLiked ? "Unlike" : "Like"}
+              className={
+                song.userLiked
+                  ? "bg-primary hover:bg-primary/90 text-white font-bold"
+                  : "bg-white text-foreground border-2 border-border hover:border-primary font-bold"
+              }
+            >
+              <Heart
+                className="size-4"
+                fill={song.userLiked ? "currentColor" : "none"}
+              />
+              {song.likeCount}
+            </Button>
+          </LikesTooltip>
           <Button
             type="button"
             onClick={() => onOpenEngagement(song)}
