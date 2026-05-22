@@ -9,9 +9,10 @@ interface HeaderProps {
     picture?: string;
     email?: string;
   } | null;
+  settings?: React.ReactNode;
 }
 
-export function Header({ user }: HeaderProps) {
+export function Header({ user, settings }: HeaderProps) {
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
@@ -29,7 +30,7 @@ export function Header({ user }: HeaderProps) {
         </div>
         {user && (
           <div className="shrink-0">
-            <UserMenu user={user} />
+            <UserMenu user={user} settings={settings} />
           </div>
         )}
       </div>

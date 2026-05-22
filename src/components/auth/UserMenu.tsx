@@ -10,9 +10,10 @@ interface UserMenuProps {
     picture?: string;
     email?: string;
   };
+  settings?: React.ReactNode;
 }
 
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu({ user, settings }: UserMenuProps) {
   return (
     <div className="flex items-center gap-2 sm:gap-3 bg-white px-2 py-1.5 sm:px-4 sm:py-2 rounded-xl shadow-md border border-border">
       {user.picture && (
@@ -27,6 +28,7 @@ export function UserMenu({ user }: UserMenuProps) {
       <span className="text-sm font-semibold text-foreground hidden md:inline max-w-[12rem] truncate">
         {user.name || user.email}
       </span>
+      {settings}
       <SignOutButton>
         <button
           type="button"
