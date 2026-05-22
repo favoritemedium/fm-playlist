@@ -1,0 +1,126 @@
+{
+  "common": {
+    "comingSoon": "Segera hadir"
+  },
+  "home": {
+    "tagline": "Bagikan lagu favoritmu, temukan apa yang menggerakkan FM crew",
+    "signInPrompt": "Masuk dengan akun Google @{domain} kamu",
+    "auth": {
+      "notAllowedTitle": "Akun tidak diizinkan",
+      "notAllowedDescription": "Akses dibatasi untuk akun Google @{domain}. Keluar dan pilih akun yang disetujui."
+    }
+  },
+  "auth": {
+    "signIn": "Masuk dengan Google",
+    "switchAccount": "Ganti akun",
+    "signOut": "Keluar"
+  },
+  "loading": {
+    "message": "Memuat playlist terbaru..."
+  },
+  "settings": {
+    "ariaLabel": "Pengaturan playlist",
+    "title": "Pengaturan",
+    "playback": {
+      "sectionTitle": "Pengaturan Pemutaran",
+      "autoPlay": {
+        "label": "Mulai putar saat dipilih",
+        "description": "Video diputar otomatis saat tile dipilih"
+      }
+    },
+    "language": {
+      "sectionTitle": "Bahasa",
+      "en": "English",
+      "ko": "한국어",
+      "id": "Bahasa Indonesia",
+      "si": "සිංහල",
+      "ta": "தமிழ்",
+      "vi": "Tiếng Việt"
+    }
+  },
+  "playlist": {
+    "allTracks": "Semua Lagu",
+    "sort": {
+      "newest": "Terbaru",
+      "mostLiked": "Paling disukai"
+    },
+    "filter": {
+      "all": "Semua"
+    },
+    "search": {
+      "placeholder": "Cari nama, judul, artis...",
+      "ariaLabel": "Cari lagu",
+      "clearAriaLabel": "Hapus pencarian"
+    },
+    "empty": {
+      "noMatchingTitle": "Tidak ada lagu yang cocok",
+      "noMatchingDescription": "Coba kata kunci lain",
+      "noTracksTitle": "Belum ada lagu",
+      "noTracksDescription": "Jadilah yang pertama menambahkan lagu bulan ini"
+    },
+    "notification": {
+      "newComment": "Komentar baru dari {name} di lagumu",
+      "dismissError": "Tutup error",
+      "dismissNotification": "Tutup notifikasi"
+    },
+    "footer": {
+      "track": "{count, plural, one {# lagu} other {# lagu}}",
+      "inPeriod": "di {period}",
+      "total": "total"
+    }
+  },
+  "addTrack": {
+    "button": "Tambah Lagu",
+    "title": "Tambah ke Playlist Bulan Ini",
+    "description": "Bagikan link YouTube dengan komunitas",
+    "youtubeUrlLabel": "URL YouTube",
+    "youtubeUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "descriptionLabel": "Deskripsi (opsional)",
+    "descriptionPlaceholder": "Kenapa lagu ini?",
+    "submitButton": "Tambah ke Playlist",
+    "submittingButton": "Menambahkan...",
+    "errors": {
+      "failedToAdd": "Gagal menambahkan lagu",
+      "failedToRead": "Gagal membaca lagu yang ditambahkan",
+      "somethingWentWrong": "Terjadi kesalahan"
+    }
+  },
+  "videoPlayer": {
+    "iframeTitle": "Video YouTube",
+    "like": "Suka",
+    "unlike": "Batal suka",
+    "openComments": "Buka komentar",
+    "added": "Ditambahkan {date}",
+    "byArtist": "oleh {artist}"
+  },
+  "engagement": {
+    "likedBy": "Disukai oleh",
+    "loading": "Memuat...",
+    "noLikesYet": "Belum ada yang menyukai",
+    "addComment": "Tambah komentar",
+    "post": "Kirim",
+    "writeReply": "Tulis balasan",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "reply": "Balas",
+    "noCommentsYet": "Belum ada komentar",
+    "editComment": "Edit komentar",
+    "deleteComment": "Hapus komentar",
+    "likesComments": "{likes} suka · {comments} komentar",
+    "track": "Lagu",
+    "errors": {
+      "failedToLoadLikes": "Gagal memuat suka",
+      "failedToLoadComments": "Gagal memuat komentar",
+      "failedToPostComment": "Gagal mengirim komentar",
+      "failedToUpdateComment": "Gagal memperbarui komentar",
+      "failedToDeleteComment": "Gagal menghapus komentar",
+      "failedToUpdateLike": "Gagal memperbarui suka",
+      "somethingWentWrong": "Terjadi kesalahan"
+    }
+  },
+  "error": {
+    "title": "Terjadi kesalahan",
+    "description": "Playlist tidak dapat dimuat. Silakan coba lagi dalam beberapa saat.",
+    "tryAgain": "Coba lagi"
+  }
+}

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { cn } from "@/components/ui/utils";
 
 interface LoadingScreenProps {
@@ -5,7 +6,9 @@ interface LoadingScreenProps {
   overlay?: boolean;
 }
 
-export function LoadingScreen({ className, overlay = false }: LoadingScreenProps) {
+export async function LoadingScreen({ className, overlay = false }: LoadingScreenProps) {
+  const t = await getTranslations("loading");
+
   return (
     <div
       className={cn(
@@ -21,7 +24,7 @@ export function LoadingScreen({ className, overlay = false }: LoadingScreenProps
           FM Playlist
         </h1>
         <p className="text-muted-foreground font-medium">
-          Loading the latest playlist...
+          {t("message")}
         </p>
       </div>
     </div>

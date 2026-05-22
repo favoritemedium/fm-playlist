@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { SongLiker } from "@/types/song";
 import {
   getCachedLikers,
@@ -24,6 +25,7 @@ function getInitials(name: string, email: string): string {
 }
 
 export function LikesTooltip({ songId, likeCount, children }: LikesTooltipProps) {
+  const t = useTranslations("engagement");
   const [mounted, setMounted] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [likers, setLikers] = useState<SongLiker[] | null>(null);
@@ -65,7 +67,7 @@ export function LikesTooltip({ songId, likeCount, children }: LikesTooltipProps)
         
         fetch(`/api/songs/${songId}/likes`)
           .then((res) => {
-            if (!res.ok) throw new Error("Failed to load likes");
+            if (!res.ok) throw new Error(t("errors.failedToLoadLikes"));
             return res.json() as Promise<{ likers: SongLiker[] }>;
           })
           .then((data) => {
@@ -74,14 +76,14 @@ export function LikesTooltip({ songId, likeCount, children }: LikesTooltipProps)
             setError(null);
           })
           .catch((err) => {
-            setError(err instanceof Error ? err.message : "Error");
+            setError(err instanceof Error ? err.message : t("errors.somethingWentWrong"));
           })
           .finally(() => {
             setLoading(false);
           });
       }
     }
-  }, [songId, likeCount, showTooltip]);
+  }, [songId, likeCount, showTooltip, t]);
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     if (likeCount === 0) return;
@@ -156,16 +158,16 @@ export function LikesTooltip({ songId, likeCount, children }: LikesTooltipProps)
               >
                 <div className="space-y-2">
                   <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                    Liked by
+                    {t("likedBy")}
                   </div>
                   {loading ? (
                     <div className="flex items-center gap-1.5 text-slate-300 py-1">
                       <span className="size-3 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" />
-                      <span className="text-[11px] font-medium">Loading...</span>
+                      <span className="text-[11px] font-medium">{t("loading")}</span>
                     </div>
                   ) : error ? (
                     <div className="text-[11px] text-destructive font-medium py-1">
-                      Error loading likes
+                      {t("errors.failedToLoadLikes")}
                     </div>
                   ) : likers && likers.length > 0 ? (
                     <div className="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto pr-1">
@@ -193,7 +195,7 @@ export function LikesTooltip({ songId, likeCount, children }: LikesTooltipProps)
                     </div>
                   ) : (
                     <div className="text-[11px] text-slate-400 font-medium py-1">
-                      No likes yet
+                      {t("noLikesYet")}
                     </div>
                   )}
                 </div>

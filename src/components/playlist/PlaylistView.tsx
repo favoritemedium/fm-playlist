@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowDownUp, Bell, X } from "lucide-react";
 import { PlaylistSettings } from "./PlaylistSettings";
+import { LanguageDropdown } from "./LanguageDropdown";
 import type {
   Song,
   SongEngagementEvent,
@@ -37,6 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateLikerInCache } from "@/lib/likers-cache";
+import { useTranslations } from "next-intl";
 
 interface PlaylistViewProps {
   initialSongs: Song[];
@@ -82,6 +84,8 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
   const [autoplayEnabled, setAutoplayEnabled] = useState(false);
   const [shouldAutoplayActiveVideo, setShouldAutoplayActiveVideo] =
     useState(false);
+  const t = useTranslations("playlist");
+  const tEngagement = useTranslations("engagement");
 
   const {
     availableYears,
@@ -294,13 +298,13 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
           );
         }
         setEngagementError(
-          err instanceof Error ? err.message : "Failed to update like"
+          err instanceof Error ? err.message : tEngagement("errors.failedToUpdateLike")
         );
       } finally {
         setLikePending(song.id, false);
       }
     },
-    [applyEngagementSummary, pendingLikeSongIds, setLikePending, user]
+    [applyEngagementSummary, pendingLikeSongIds, setLikePending, user, tEngagement]
   );
 
   useEffect(() => {
@@ -403,10 +407,13 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
         <Header
           user={user}
           settings={
-            <PlaylistSettings
-              startPlayingWhenSelected={autoplayEnabled}
-              onStartPlayingWhenSelectedChange={handleAutoplayToggle}
-            />
+            <div className="flex items-center gap-2">
+              <LanguageDropdown />
+              <PlaylistSettings
+                startPlayingWhenSelected={autoplayEnabled}
+                onStartPlayingWhenSelectedChange={handleAutoplayToggle}
+              />
+            </div>
           }
         />
 
@@ -440,8 +447,8 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Newest</SelectItem>
-                  <SelectItem value="most-liked">Most liked</SelectItem>
+                  <SelectItem value="newest">{t("sort.newest")}</SelectItem>
+                  <SelectItem value="most-liked">{t("sort.mostLiked")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -462,8 +469,8 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
                 <span>{engagementError}</span>
                 <button
                   type="button"
-                  aria-label="Dismiss error"
-                  title="Dismiss error"
+                  aria-label={t("notification.dismissError")}
+                  title={t("notification.dismissError")}
                   onClick={() => setEngagementError(null)}
                   className="rounded-md p-1 hover:bg-destructive/10"
                 >
@@ -483,13 +490,13 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
                 >
                   <Bell className="size-5 shrink-0 text-secondary" />
                   <span className="truncate text-sm font-bold text-foreground">
-                    New comment from {notification.commenterName} on your track
+                    {t("notification.newComment", { name: notification.commenterName })}
                   </span>
                 </button>
                 <button
                   type="button"
-                  aria-label="Dismiss notification"
-                  title="Dismiss notification"
+                  aria-label={t("notification.dismissNotification")}
+                  title={t("notification.dismissNotification")}
                   onClick={() => dismissNotification(notification.id)}
                   className="rounded-md p-1 text-muted-foreground hover:bg-secondary/10 hover:text-foreground"
                 >
@@ -508,12 +515,12 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
             className="text-center py-20"
           >
             <h3 className="text-3xl font-black mb-3 text-foreground">
-              {searchQuery ? "No matching tracks" : "No tracks yet"}
+              {searchQuery ? t("empty.noMatchingTitle") : t("empty.noTracksTitle")}
             </h3>
             <p className="text-lg text-muted-foreground mb-8 font-medium">
               {searchQuery
-                ? "Try a different search term"
-                : "Be the first to add a track this month"}
+                ? t("empty.noMatchingDescription")
+                : t("empty.noTracksDescription")}
             </p>
             {!searchQuery && user && (
               <AddTrackDialog onTrackAdded={handleTrackAdded} />

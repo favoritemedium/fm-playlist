@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { Song } from "@/types/song";
 import { SongCard } from "./SongCard";
 
@@ -14,9 +15,11 @@ export function ThumbnailGrid({
   activeVideoId,
   onSelect,
 }: ThumbnailGridProps) {
+  const t = useTranslations("playlist");
+
   return (
     <div>
-      <h3 className="text-xl font-black mb-4 text-foreground">All Tracks</h3>
+      <h3 className="text-xl font-black mb-4 text-foreground">{t("allTracks")}</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {songs.map((song, index) => (
           <SongCard

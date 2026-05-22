@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Select,
   SelectContent,
@@ -10,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import {
   ALL_FILTER_VALUE,
-  getMonthName,
   type PlaylistFilterValue,
 } from "@/lib/constants";
 
@@ -35,6 +35,15 @@ export function MonthYearFilter({
   onYearChange,
   onMonthChange,
 }: MonthYearFilterProps) {
+  const t = useTranslations("playlist.filter");
+  const locale = useLocale();
+
+  function getLocalizedMonthName(month: number): string {
+    return new Intl.DateTimeFormat(locale, { month: "long" }).format(
+      new Date(2024, month - 1, 1)
+    );
+  }
+
   return (
     <div className="flex items-center gap-2 sm:gap-3 bg-white px-3 sm:px-5 py-2 sm:py-3 rounded-xl shadow-md border border-border w-full sm:w-auto">
       <Calendar className="w-5 h-5 text-secondary shrink-0" strokeWidth={2.5} />
@@ -46,7 +55,7 @@ export function MonthYearFilter({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL_FILTER_VALUE}>All</SelectItem>
+          <SelectItem value={ALL_FILTER_VALUE}>{t("all")}</SelectItem>
           {availableYears.map((year) => (
             <SelectItem key={year} value={year.toString()}>
               {year}
@@ -62,10 +71,10 @@ export function MonthYearFilter({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL_FILTER_VALUE}>All</SelectItem>
+          <SelectItem value={ALL_FILTER_VALUE}>{t("all")}</SelectItem>
           {availableMonths.map((month) => (
             <SelectItem key={month} value={month.toString()}>
-              {getMonthName(month)}
+              {getLocalizedMonthName(month)}
             </SelectItem>
           ))}
         </SelectContent>
