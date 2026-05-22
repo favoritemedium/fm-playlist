@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowDownUp, Bell, X } from "lucide-react";
+import { PlaylistSettings } from "./PlaylistSettings";
 import type {
   Song,
   SongEngagementEvent,
@@ -317,7 +318,6 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
   const handleAutoplayToggle = useCallback(() => {
     setAutoplayEnabled((currentValue) => {
       const nextValue = !currentValue;
-
       try {
         window.localStorage.setItem(
           AUTOPLAY_STORAGE_KEY,
@@ -326,7 +326,6 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
       } catch {
         // Ignore unavailable localStorage, such as private browsing restrictions.
       }
-
       return nextValue;
     });
   }, []);
@@ -401,7 +400,15 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
   return (
     <div className="min-h-screen bg-background">
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <Header user={user} />
+        <Header
+          user={user}
+          settings={
+            <PlaylistSettings
+              startPlayingWhenSelected={autoplayEnabled}
+              onStartPlayingWhenSelectedChange={handleAutoplayToggle}
+            />
+          }
+        />
 
         {/* Controls */}
         <motion.div
@@ -438,30 +445,7 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center justify-between gap-3 bg-white px-4 py-2 rounded-xl shadow-md border border-border w-full sm:w-auto min-h-[44px]">
-              <span
-                id="autoplay-switch-label"
-                className="text-sm font-bold text-foreground whitespace-nowrap"
-              >
-                Autoplay
-              </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={autoplayEnabled}
-                aria-labelledby="autoplay-switch-label"
-                onClick={handleAutoplayToggle}
-                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                  autoplayEnabled ? "bg-primary" : "bg-switch-background"
-                }`}
-              >
-                <span
-                  className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                    autoplayEnabled ? "translate-x-5" : "translate-x-0.5"
-                  }`}
-                />
-              </button>
-            </div>
+
           </div>
 
           {user && (
