@@ -1,0 +1,126 @@
+{
+  "common": {
+    "comingSoon": "விரைவில் வருகிறது"
+  },
+  "home": {
+    "tagline": "உங்கள் பிடித்த பாடல்களைப் பகிருங்கள், FM குழுவை நகர்த்துவதை கண்டுபிடியுங்கள்",
+    "signInPrompt": "உங்கள் @{domain} Google கணக்கில் உள்நுழையுங்கள்",
+    "auth": {
+      "notAllowedTitle": "கணக்கு அனுமதிக்கப்படவில்லை",
+      "notAllowedDescription": "அணுகல் @{domain} Google கணக்குகளுக்கு மட்டுமே. வெளியேறி அங்கீகரிக்கப்பட்ட கணக்கைத் தேர்ந்தெடுக்கவும்."
+    }
+  },
+  "auth": {
+    "signIn": "Google மூலம் உள்நுழையுங்கள்",
+    "switchAccount": "கணக்கை மாற்றுங்கள்",
+    "signOut": "வெளியேறு"
+  },
+  "loading": {
+    "message": "சமீபத்திய பாடல் பட்டியலை ஏற்றுகிறது..."
+  },
+  "settings": {
+    "ariaLabel": "பட்டியல் அமைப்புகள்",
+    "title": "அமைப்புகள்",
+    "playback": {
+      "sectionTitle": "இயக்க அமைப்புகள்",
+      "autoPlay": {
+        "label": "தேர்ந்தெடுக்கும்போது இயக்கத் தொடங்கு",
+        "description": "ஒரு டைல் தேர்ந்தெடுக்கப்படும்போது வீடியோ தானாக இயங்கும்"
+      }
+    },
+    "language": {
+      "sectionTitle": "மொழி",
+      "en": "English",
+      "ko": "한국어",
+      "id": "Bahasa Indonesia",
+      "si": "සිංහල",
+      "ta": "தமிழ்",
+      "vi": "Tiếng Việt"
+    }
+  },
+  "playlist": {
+    "allTracks": "அனைத்து பாடல்களும்",
+    "sort": {
+      "newest": "புதியது",
+      "mostLiked": "அதிகம் விரும்பியது"
+    },
+    "filter": {
+      "all": "அனைத்தும்"
+    },
+    "search": {
+      "placeholder": "பெயர், தலைப்பு, கலைஞர்...",
+      "ariaLabel": "பாடல்களை தேடு",
+      "clearAriaLabel": "தேடலை அழி"
+    },
+    "empty": {
+      "noMatchingTitle": "பொருந்தும் பாடல்கள் இல்லை",
+      "noMatchingDescription": "வேறு தேடல் சொல்லை முயற்சிக்கவும்",
+      "noTracksTitle": "இன்னும் பாடல்கள் இல்லை",
+      "noTracksDescription": "இந்த மாதம் முதல் பாடலை சேர்க்க முதலாளியாகுங்கள்"
+    },
+    "notification": {
+      "newComment": "{name} உங்கள் பாடலில் புதிய கருத்து சேர்த்தார்",
+      "dismissError": "பிழையை நிராகரி",
+      "dismissNotification": "அறிவிப்பை நிராகரி"
+    },
+    "footer": {
+      "track": "{count, plural, one {# பாடல்} other {# பாடல்கள்}}",
+      "inPeriod": "{period} இல்",
+      "total": "மொத்தம்"
+    }
+  },
+  "addTrack": {
+    "button": "பாடல் சேர்க்க",
+    "title": "இந்த மாதத்தின் பட்டியலில் சேர்க்க",
+    "description": "சமுதாயத்துடன் YouTube இணைப்பை பகிரவும்",
+    "youtubeUrlLabel": "YouTube URL",
+    "youtubeUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "descriptionLabel": "விளக்கம் (விருப்பத்தேர்வு)",
+    "descriptionPlaceholder": "இந்த பாடல் ஏன்?",
+    "submitButton": "பட்டியலில் சேர்க்க",
+    "submittingButton": "சேர்க்கிறது...",
+    "errors": {
+      "failedToAdd": "பாடல் சேர்க்கத் தவறியது",
+      "failedToRead": "சேர்க்கப்பட்ட பாடலை படிக்கத் தவறியது",
+      "somethingWentWrong": "ஏதோ தவறு நடந்தது"
+    }
+  },
+  "videoPlayer": {
+    "iframeTitle": "YouTube வீடியோ",
+    "like": "விரும்பு",
+    "unlike": "விரும்புதல் நீக்கு",
+    "openComments": "கருத்துகளைத் திற",
+    "added": "{date} இல் சேர்க்கப்பட்டது",
+    "byArtist": "{artist} ஆல்"
+  },
+  "engagement": {
+    "likedBy": "விரும்பியவர்கள்",
+    "loading": "ஏற்றுகிறது...",
+    "noLikesYet": "இன்னும் விரும்பல் இல்லை",
+    "addComment": "கருத்து சேர்க்க",
+    "post": "பதிவிடு",
+    "writeReply": "பதிலை எழுது",
+    "cancel": "ரத்துசெய்",
+    "save": "சேமி",
+    "reply": "பதில்",
+    "noCommentsYet": "இன்னும் கருத்துகள் இல்லை",
+    "editComment": "கருத்தை திருத்து",
+    "deleteComment": "கருத்தை நீக்கு",
+    "likesComments": "{likes} விரும்பல்கள் · {comments} கருத்துகள்",
+    "track": "பாடல்",
+    "errors": {
+      "failedToLoadLikes": "விரும்பல்களை ஏற்றத் தவறியது",
+      "failedToLoadComments": "கருத்துகளை ஏற்றத் தவறியது",
+      "failedToPostComment": "கருத்து பதிவிடத் தவறியது",
+      "failedToUpdateComment": "கருத்தை புதுப்பிக்கத் தவறியது",
+      "failedToDeleteComment": "கருத்தை நீக்கத் தவறியது",
+      "failedToUpdateLike": "விரும்பலை புதுப்பிக்கத் தவறியது",
+      "somethingWentWrong": "ஏதோ தவறு நடந்தது"
+    }
+  },
+  "error": {
+    "title": "ஏதோ தவறு நடந்துவிட்டது",
+    "description": "பின்னணி பட்டியலை ஏற்ற முடியவில்லை. சிறிது நேரத்தில் மீண்டும் முயற்சிக்கவும்.",
+    "tryAgain": "மீண்டும் முயற்சிக்கவும்"
+  }
+}

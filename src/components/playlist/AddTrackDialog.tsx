@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +32,7 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
     youtubeUrl: "",
     description: "",
   });
+  const t = useTranslations("addTrack");
 
   const errorId = "add-track-error";
 
@@ -55,12 +57,12 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
           "error" in data &&
           typeof data.error === "string"
             ? data.error
-            : "Failed to add track";
+            : t("errors.failedToAdd");
         throw new Error(message);
       }
 
       if (!data || typeof data !== "object") {
-        throw new Error("Failed to read added track");
+        throw new Error(t("errors.failedToRead"));
       }
 
       const song = data as Song;
@@ -68,7 +70,7 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
       setFormData({ youtubeUrl: "", description: "" });
       setIsOpen(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : t("errors.somethingWentWrong"));
     } finally {
       setIsSubmitting(false);
     }
@@ -82,22 +84,22 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
       <DialogTrigger asChild>
         <Button className="w-full lg:w-auto bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 px-6 sm:px-8 py-5 sm:py-6 font-bold">
           <Plus className="w-5 h-5 mr-2" strokeWidth={3} />
-          Add Track
+          {t("button")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-white border-2 border-primary/20 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-3xl font-black text-primary">
-            Add to This Month&apos;s Playlist
+            {t("title")}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Share a YouTube link with the community
+            {t("description")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-5 mt-4">
           <div>
             <label htmlFor="youtube-url" className="block mb-2 font-bold text-foreground">
-              YouTube URL
+              {t("youtubeUrlLabel")}
             </label>
             <Input
               id="youtube-url"
@@ -108,7 +110,7 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, youtubeUrl: e.target.value }))
               }
-              placeholder="https://youtube.com/watch?v=..."
+              placeholder={t("youtubeUrlPlaceholder")}
               required
               maxLength={YOUTUBE_URL_MAX_LENGTH}
               aria-invalid={Boolean(error)}
@@ -118,7 +120,7 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
           </div>
           <div>
             <label htmlFor="description" className="block mb-2 font-bold text-foreground">
-              Description (optional)
+              {t("descriptionLabel")}
             </label>
             <Textarea
               id="description"
@@ -129,7 +131,7 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
                   description: e.target.value,
                 }))
               }
-              placeholder="Why this track?"
+              placeholder={t("descriptionPlaceholder")}
               rows={3}
               maxLength={SONG_DESCRIPTION_MAX_LENGTH}
               className="bg-input-background resize-none border-2 border-border focus:border-primary"
@@ -149,7 +151,7 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
             aria-busy={isSubmitting}
             className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-6 shadow-lg shadow-primary/30"
           >
-            {isSubmitting ? "Adding..." : "Add to Playlist"}
+            {isSubmitting ? t("submittingButton") : t("submitButton")}
           </Button>
         </form>
       </DialogContent>

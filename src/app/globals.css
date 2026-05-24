@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap");
+
 @import "tailwindcss" source(none);
 @source "../**/*.{js,ts,jsx,tsx}";
 
@@ -7,8 +9,8 @@
 
 :root {
   --font-size: 16px;
-  --font-display: var(--font-montserrat), "Montserrat", sans-serif;
-  --font-body: var(--font-nunito-sans), "Nunito Sans", sans-serif;
+  --font-display: var(--font-montserrat), "Montserrat", "Noto Sans KR", sans-serif;
+  --font-body: var(--font-nunito-sans), "Nunito Sans", "Noto Sans KR", sans-serif;
   --background: #f1f1f1;
   --foreground: #1a1a1a;
   --card: #ffffff;

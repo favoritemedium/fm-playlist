@@ -71,14 +71,15 @@ export function compareDateOnlyDesc(a: string | Date, b: string | Date): number 
   return right.localeCompare(left);
 }
 
-export function formatDateOnlyForDisplay(value: string | Date): string {
+export function formatDateOnlyForDisplay(value: string | Date, locale: string = "en"): string {
   const dateOnly = toDateOnlyString(value);
   const { year, month, day } = getDateParts(dateOnly);
 
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
     timeZone: "UTC",
   }).format(new Date(Date.UTC(year, month - 1, day)));
 }
+

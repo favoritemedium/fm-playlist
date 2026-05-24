@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { UserMenu } from "@/components/auth/UserMenu";
 
 interface HeaderProps {
@@ -13,23 +14,25 @@ interface HeaderProps {
 }
 
 export function Header({ user, settings }: HeaderProps) {
+  const t = useTranslations("home");
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-10 sm:mb-12"
+      className="mb-8 sm:mb-12"
     >
-      <div className="flex items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="min-w-0 flex-1">
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-primary">
+          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-primary whitespace-nowrap">
             FM Playlist
           </h1>
-          <p className="mt-2 text-sm sm:text-base md:text-lg text-muted-foreground font-medium">
-            Share your favorite tracks, discover what&apos;s moving the FM crew
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm md:text-base text-muted-foreground font-semibold">
+            {t("tagline")}
           </p>
         </div>
         {user && (
-          <div className="shrink-0">
+          <div className="shrink-0 self-start sm:self-center">
             <UserMenu user={user} settings={settings} />
           </div>
         )}

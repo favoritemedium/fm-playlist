@@ -1,0 +1,126 @@
+{
+  "common": {
+    "comingSoon": "Sắp ra mắt"
+  },
+  "home": {
+    "tagline": "Chia sẻ bản nhạc yêu thích, khám phá những gì đang làm rung động FM crew",
+    "signInPrompt": "Đăng nhập bằng tài khoản Google @{domain} của bạn",
+    "auth": {
+      "notAllowedTitle": "Tài khoản không được phép",
+      "notAllowedDescription": "Quyền truy cập bị giới hạn cho tài khoản Google @{domain}. Đăng xuất và chọn tài khoản được duyệt."
+    }
+  },
+  "auth": {
+    "signIn": "Đăng nhập bằng Google",
+    "switchAccount": "Chuyển tài khoản",
+    "signOut": "Đăng xuất"
+  },
+  "loading": {
+    "message": "Đang tải danh sách nhạc mới nhất..."
+  },
+  "settings": {
+    "ariaLabel": "Cài đặt danh sách nhạc",
+    "title": "Cài đặt",
+    "playback": {
+      "sectionTitle": "Cài đặt phát nhạc",
+      "autoPlay": {
+        "label": "Bắt đầu phát khi chọn",
+        "description": "Video tự động phát khi chọn một ô"
+      }
+    },
+    "language": {
+      "sectionTitle": "Ngôn ngữ",
+      "en": "English",
+      "ko": "한국어",
+      "id": "Bahasa Indonesia",
+      "si": "සිංහල",
+      "ta": "தமிழ்",
+      "vi": "Tiếng Việt"
+    }
+  },
+  "playlist": {
+    "allTracks": "Tất cả bài hát",
+    "sort": {
+      "newest": "Mới nhất",
+      "mostLiked": "Được thích nhiều nhất"
+    },
+    "filter": {
+      "all": "Tất cả"
+    },
+    "search": {
+      "placeholder": "Tìm theo tên, tiêu đề, nghệ sĩ...",
+      "ariaLabel": "Tìm kiếm bài hát",
+      "clearAriaLabel": "Xóa tìm kiếm"
+    },
+    "empty": {
+      "noMatchingTitle": "Không tìm thấy bài hát",
+      "noMatchingDescription": "Thử từ khóa tìm kiếm khác",
+      "noTracksTitle": "Chưa có bài hát nào",
+      "noTracksDescription": "Hãy là người đầu tiên thêm bài hát tháng này"
+    },
+    "notification": {
+      "newComment": "{name} đã bình luận trên bài hát của bạn",
+      "dismissError": "Đóng lỗi",
+      "dismissNotification": "Đóng thông báo"
+    },
+    "footer": {
+      "track": "{count, plural, one {# bài hát} other {# bài hát}}",
+      "inPeriod": "trong {period}",
+      "total": "tổng cộng"
+    }
+  },
+  "addTrack": {
+    "button": "Thêm bài hát",
+    "title": "Thêm vào danh sách tháng này",
+    "description": "Chia sẻ link YouTube với cộng đồng",
+    "youtubeUrlLabel": "URL YouTube",
+    "youtubeUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "descriptionLabel": "Mô tả (tùy chọn)",
+    "descriptionPlaceholder": "Tại sao bài hát này?",
+    "submitButton": "Thêm vào danh sách",
+    "submittingButton": "Đang thêm...",
+    "errors": {
+      "failedToAdd": "Không thể thêm bài hát",
+      "failedToRead": "Không thể đọc bài hát vừa thêm",
+      "somethingWentWrong": "Có lỗi xảy ra"
+    }
+  },
+  "videoPlayer": {
+    "iframeTitle": "Video YouTube",
+    "like": "Thích",
+    "unlike": "Bỏ thích",
+    "openComments": "Mở bình luận",
+    "added": "Đã thêm {date}",
+    "byArtist": "bởi {artist}"
+  },
+  "engagement": {
+    "likedBy": "Được thích bởi",
+    "loading": "Đang tải...",
+    "noLikesYet": "Chưa có ai thích",
+    "addComment": "Thêm bình luận",
+    "post": "Đăng",
+    "writeReply": "Viết trả lời",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "reply": "Trả lời",
+    "noCommentsYet": "Chưa có bình luận nào",
+    "editComment": "Chỉnh sửa bình luận",
+    "deleteComment": "Xóa bình luận",
+    "likesComments": "{likes} lượt thích · {comments} bình luận",
+    "track": "Bài hát",
+    "errors": {
+      "failedToLoadLikes": "Không thể tải lượt thích",
+      "failedToLoadComments": "Không thể tải bình luận",
+      "failedToPostComment": "Không thể đăng bình luận",
+      "failedToUpdateComment": "Không thể cập nhật bình luận",
+      "failedToDeleteComment": "Không thể xóa bình luận",
+      "failedToUpdateLike": "Không thể cập nhật lượt thích",
+      "somethingWentWrong": "Có lỗi xảy ra"
+    }
+  },
+  "error": {
+    "title": "Có lỗi xảy ra",
+    "description": "Không thể tải danh sách phát. Vui lòng thử lại sau giây lát.",
+    "tryAgain": "Thử lại"
+  }
+}

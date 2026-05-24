@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { Heart, MessageSquare } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import type { Song } from "@/types/song";
 import { formatDateOnlyForDisplay } from "@/lib/dates";
 import { getYouTubeEmbedUrl } from "@/lib/youtube";
@@ -23,6 +24,8 @@ export function VideoPlayer({
   onLikeToggle,
   onOpenEngagement,
 }: VideoPlayerProps) {
+  const t = useTranslations("videoPlayer");
+  const locale = useLocale();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -33,7 +36,7 @@ export function VideoPlayer({
         <iframe
           key={song.id}
           src={getYouTubeEmbedUrl(song.youtubeVideoId, autoplay)}
-          title={song.songTitle || "YouTube video"}
+          title={song.songTitle || t("iframeTitle")}
           className="absolute inset-0 w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -45,7 +48,7 @@ export function VideoPlayer({
           {song.songTitle && (
             <p className="text-sm text-muted-foreground">
               — {song.songTitle}
-              {song.artistName && ` by ${song.artistName}`}
+              {song.artistName && ` ${t("byArtist", { artist: song.artistName })}`}
             </p>
           )}
         </div>
@@ -55,7 +58,7 @@ export function VideoPlayer({
           </p>
         )}
         <div className="text-sm text-muted-foreground font-semibold">
-          Added {formatDateOnlyForDisplay(song.submittedDate)}
+          {t("added", { date: formatDateOnlyForDisplay(song.submittedDate, locale) })}
         </div>
         <div className="flex flex-wrap items-center gap-2 pt-2">
           <LikesTooltip songId={song.id} likeCount={song.likeCount}>
@@ -63,7 +66,7 @@ export function VideoPlayer({
               type="button"
               disabled={isLikePending}
               onClick={() => onLikeToggle(song)}
-              title={song.userLiked ? "Unlike" : "Like"}
+              title={song.userLiked ? t("unlike") : t("like")}
               className={
                 song.userLiked
                   ? "bg-primary hover:bg-primary/90 text-white font-bold"
@@ -80,7 +83,7 @@ export function VideoPlayer({
           <Button
             type="button"
             onClick={() => onOpenEngagement(song)}
-            title="Open comments"
+            title={t("openComments")}
             className="bg-white text-foreground border-2 border-border hover:border-secondary font-bold"
           >
             <MessageSquare className="size-4 text-secondary" />

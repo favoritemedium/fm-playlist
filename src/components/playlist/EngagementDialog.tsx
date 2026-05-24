@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Edit2,
   Heart,
@@ -76,8 +77,8 @@ async function readJsonResponse<T>(
   return data as T;
 }
 
-function formatActivityTime(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+function formatActivityTime(value: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
     hour: "numeric",
@@ -129,6 +130,8 @@ function CommentEntry({
   const [isEditing, setIsEditing] = useState(false);
   const [editBody, setEditBody] = useState(item.body);
   const [isSaving, setIsSaving] = useState(false);
+  const t = useTranslations("engagement");
+  const locale = useLocale();
 
   useEffect(() => {
     if (!isEditing) setEditBody(item.body);
@@ -158,7 +161,7 @@ function CommentEntry({
             {item.author.name}
           </p>
           <p className="text-xs font-semibold text-muted-foreground">
-            {formatActivityTime(item.createdAt)}
+            {formatActivityTime(item.createdAt, locale)}
           </p>
         </div>
 
@@ -182,7 +185,7 @@ function CommentEntry({
                   size="sm"
                   onClick={() => setIsEditing(false)}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
                 <Button
                   type="button"
@@ -190,7 +193,7 @@ function CommentEntry({
                   disabled={isSaving || !editBody.trim()}
                   onClick={handleSave}
                 >
-                  Save
+                  {t("save")}
                 </Button>
               </div>
             </div>
@@ -206,8 +209,8 @@ function CommentEntry({
             {item.canEdit && (
               <button
                 type="button"
-                aria-label="Edit comment"
-                title="Edit comment"
+                aria-label={t("editComment")}
+                title={t("editComment")}
                 onClick={() => void setIsEditing(true)}
                 className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               >
@@ -217,8 +220,8 @@ function CommentEntry({
             {item.canDelete && (
               <button
                 type="button"
-                aria-label="Delete comment"
-                title="Delete comment"
+                aria-label={t("deleteComment")}
+                title={t("deleteComment")}
                 onClick={() => void onDelete(item.id)}
                 className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
               >
@@ -248,6 +251,7 @@ export function EngagementDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations("engagement");
 
   const refresh = useCallback(async () => {
     if (!song) return;
@@ -261,10 +265,10 @@ export function EngagementDialog({
       ]);
 
       const [likesData, commentsData] = await Promise.all([
-        readJsonResponse<LikesResponse>(likesResponse, "Failed to load likes"),
+        readJsonResponse<LikesResponse>(likesResponse, t("errors.failedToLoadLikes")),
         readJsonResponse<CommentsResponse>(
           commentsResponse,
-          "Failed to load comments"
+          t("errors.failedToLoadComments")
         ),
       ]);
 
@@ -273,11 +277,11 @@ export function EngagementDialog({
       setComments(commentsData.comments);
       onSummaryChange(commentsData.summary);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : t("errors.somethingWentWrong"));
     } finally {
       setIsLoading(false);
     }
-  }, [onSummaryChange, song]);
+  }, [onSummaryChange, song, t]);
 
   useEffect(() => {
     if (open) {
@@ -317,7 +321,7 @@ export function EngagementDialog({
 
       const data = await readJsonResponse<CommentMutationResponse>(
         response,
-        "Failed to post comment"
+        t("errors.failedToPostComment")
       );
 
       handleCommentMutation(data);
@@ -328,7 +332,7 @@ export function EngagementDialog({
         setActiveReplyId(null);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : t("errors.somethingWentWrong"));
     } finally {
       setIsSubmitting(false);
     }
@@ -345,11 +349,11 @@ export function EngagementDialog({
 
       const data = await readJsonResponse<CommentMutationResponse>(
         response,
-        "Failed to update comment"
+        t("errors.failedToUpdateComment")
       );
       handleCommentMutation(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : t("errors.somethingWentWrong"));
       throw err;
     }
   };
@@ -363,11 +367,11 @@ export function EngagementDialog({
 
       const data = await readJsonResponse<CommentMutationResponse>(
         response,
-        "Failed to delete comment"
+        t("errors.failedToDeleteComment")
       );
       handleCommentMutation(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : t("errors.somethingWentWrong"));
     }
   };
 
@@ -376,10 +380,10 @@ export function EngagementDialog({
       <DialogContent className="bg-white border-2 border-primary/20 sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl sm:text-3xl font-black text-primary">
-            {song?.songTitle || song?.submitterName || "Track"}
+            {song?.songTitle || song?.submitterName || t("track")}
           </DialogTitle>
           <DialogDescription className="font-semibold">
-            {song ? `${song.likeCount} likes · ${song.commentCount} comments` : ""}
+            {song ? t("likesComments", { likes: song.likeCount, comments: song.commentCount }) : ""}
           </DialogDescription>
         </DialogHeader>
 
@@ -411,10 +415,10 @@ export function EngagementDialog({
             <section className="space-y-3">
               <div className="flex items-center gap-2">
                 <Users className="size-4 text-secondary" />
-                <h3 className="text-sm font-black text-foreground">Liked by</h3>
+                <h3 className="text-sm font-black text-foreground">{t("likedBy")}</h3>
               </div>
               {isLoading ? (
-                <p className="text-sm font-semibold text-muted-foreground">Loading...</p>
+                <p className="text-sm font-semibold text-muted-foreground">{t("loading")}</p>
               ) : likers.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {likers.map((liker) => (
@@ -430,7 +434,7 @@ export function EngagementDialog({
                   ))}
                 </div>
               ) : (
-                <p className="text-sm font-semibold text-muted-foreground">No likes yet</p>
+                <p className="text-sm font-semibold text-muted-foreground">{t("noLikesYet")}</p>
               )}
             </section>
 
@@ -439,7 +443,7 @@ export function EngagementDialog({
                 <Textarea
                   value={newComment}
                   onChange={(event) => setNewComment(event.target.value)}
-                  placeholder="Add a comment"
+                  placeholder={t("addComment")}
                   rows={3}
                   maxLength={SONG_COMMENT_MAX_LENGTH}
                   className="bg-input-background resize-none border-2 border-border focus:border-primary"
@@ -455,7 +459,7 @@ export function EngagementDialog({
                     className="bg-primary hover:bg-primary/90 text-white font-bold"
                   >
                     <Send className="size-4" />
-                    Post
+                    {t("post")}
                   </Button>
                 </div>
               </div>
@@ -468,7 +472,7 @@ export function EngagementDialog({
 
               <div className="space-y-5">
                 {isLoading ? (
-                  <p className="text-sm font-semibold text-muted-foreground">Loading...</p>
+                  <p className="text-sm font-semibold text-muted-foreground">{t("loading")}</p>
                 ) : comments.length > 0 ? (
                   comments.map((comment) => (
                     <div key={comment.id} className="space-y-3">
@@ -489,7 +493,7 @@ export function EngagementDialog({
                                   [comment.id]: event.target.value,
                                 }))
                               }
-                              placeholder="Write a reply"
+                              placeholder={t("writeReply")}
                               rows={2}
                               maxLength={SONG_COMMENT_MAX_LENGTH}
                               className="bg-input-background resize-none border-2 border-border focus:border-primary"
@@ -506,7 +510,7 @@ export function EngagementDialog({
                                   size="sm"
                                   onClick={() => setActiveReplyId(null)}
                                 >
-                                  Cancel
+                                  {t("cancel")}
                                 </Button>
                                 <Button
                                   type="button"
@@ -517,7 +521,7 @@ export function EngagementDialog({
                                   }
                                   onClick={() => void submitComment(comment.id)}
                                 >
-                                  Reply
+                                  {t("reply")}
                                 </Button>
                               </div>
                             </div>
@@ -529,7 +533,7 @@ export function EngagementDialog({
                             className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                           >
                             <Reply className="size-3.5" />
-                            Reply
+                            {t("reply")}
                           </button>
                         )}
                       </div>
@@ -550,7 +554,7 @@ export function EngagementDialog({
                   ))
                 ) : (
                   <p className="text-sm font-semibold text-muted-foreground">
-                    No comments yet
+                    {t("noCommentsYet")}
                   </p>
                 )}
               </div>

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Settings } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 
 interface PlaylistSettingsProps {
   startPlayingWhenSelected: boolean;
@@ -15,6 +17,7 @@ function SettingToggle({
   checked,
   onChange,
   comingSoon = false,
+  comingSoonLabel,
 }: {
   labelId: string;
   label: string;
@@ -22,6 +25,7 @@ function SettingToggle({
   checked: boolean;
   onChange: () => void;
   comingSoon?: boolean;
+  comingSoonLabel: string;
 }) {
   return (
     <div
@@ -34,7 +38,7 @@ function SettingToggle({
           </span>
           {comingSoon && (
             <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-              Coming soon
+              {comingSoonLabel}
             </span>
           )}
         </div>
@@ -67,6 +71,8 @@ export function PlaylistSettings({
 }: PlaylistSettingsProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations("settings");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     if (!open) return;
@@ -88,12 +94,12 @@ export function PlaylistSettings({
     <div ref={containerRef} className="relative">
       <button
         type="button"
-        aria-label="Playlist settings"
+        aria-label={t("ariaLabel")}
         aria-expanded={open}
-        title="Settings"
+        title={t("title")}
         onClick={() => setOpen((v) => !v)}
-        className={`rounded-md p-1 transition-colors ${
-          open ? "text-primary" : "text-muted-foreground hover:text-primary"
+        className={`rounded-xl p-2 transition-all hover:bg-muted ${
+          open ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-primary"
         }`}
       >
         <Settings className="w-4 h-4" strokeWidth={2.5} />
@@ -102,17 +108,17 @@ export function PlaylistSettings({
       {open && (
         <div className="absolute right-0 top-full mt-2 z-50 w-72 rounded-xl border border-border bg-white p-4 shadow-xl">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
-            Playback Settings
+            {t("playback.sectionTitle")}
           </p>
           <div className="space-y-5">
             <SettingToggle
               labelId="setting-start-playing"
-              label="Start playing when selected"
-              description="Video plays automatically when a tile is selected"
+              label={t("playback.autoPlay.label")}
+              description={t("playback.autoPlay.description")}
               checked={startPlayingWhenSelected}
               onChange={onStartPlayingWhenSelectedChange}
+              comingSoonLabel={tCommon("comingSoon")}
             />
-
           </div>
         </div>
       )}

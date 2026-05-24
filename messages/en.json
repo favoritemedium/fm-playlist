@@ -1,0 +1,126 @@
+{
+  "common": {
+    "comingSoon": "Coming soon"
+  },
+  "home": {
+    "tagline": "Share your favorite tracks, discover what's moving the FM crew",
+    "signInPrompt": "Sign in with your @{domain} Google account",
+    "auth": {
+      "notAllowedTitle": "Account not allowed",
+      "notAllowedDescription": "Access is restricted to @{domain} Google accounts. Sign out and choose an approved account."
+    }
+  },
+  "auth": {
+    "signIn": "Sign in with Google",
+    "switchAccount": "Switch account",
+    "signOut": "Sign out"
+  },
+  "loading": {
+    "message": "Loading the latest playlist..."
+  },
+  "settings": {
+    "ariaLabel": "Playlist settings",
+    "title": "Settings",
+    "playback": {
+      "sectionTitle": "Playback Settings",
+      "autoPlay": {
+        "label": "Start playing when selected",
+        "description": "Video plays automatically when a tile is selected"
+      }
+    },
+    "language": {
+      "sectionTitle": "Language",
+      "en": "English",
+      "ko": "한국어",
+      "id": "Bahasa Indonesia",
+      "si": "සිංහල",
+      "ta": "தமிழ்",
+      "vi": "Tiếng Việt"
+    }
+  },
+  "playlist": {
+    "allTracks": "All Tracks",
+    "sort": {
+      "newest": "Newest",
+      "mostLiked": "Most liked"
+    },
+    "filter": {
+      "all": "All"
+    },
+    "search": {
+      "placeholder": "Search by name, title, artist...",
+      "ariaLabel": "Search tracks",
+      "clearAriaLabel": "Clear search"
+    },
+    "empty": {
+      "noMatchingTitle": "No matching tracks",
+      "noMatchingDescription": "Try a different search term",
+      "noTracksTitle": "No tracks yet",
+      "noTracksDescription": "Be the first to add a track this month"
+    },
+    "notification": {
+      "newComment": "New comment from {name} on your track",
+      "dismissError": "Dismiss error",
+      "dismissNotification": "Dismiss notification"
+    },
+    "footer": {
+      "track": "{count, plural, one {track} other {tracks}}",
+      "inPeriod": "in {period}",
+      "total": "total"
+    }
+  },
+  "addTrack": {
+    "button": "Add Track",
+    "title": "Add to This Month's Playlist",
+    "description": "Share a YouTube link with the community",
+    "youtubeUrlLabel": "YouTube URL",
+    "youtubeUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "descriptionLabel": "Description (optional)",
+    "descriptionPlaceholder": "Why this track?",
+    "submitButton": "Add to Playlist",
+    "submittingButton": "Adding...",
+    "errors": {
+      "failedToAdd": "Failed to add track",
+      "failedToRead": "Failed to read added track",
+      "somethingWentWrong": "Something went wrong"
+    }
+  },
+  "videoPlayer": {
+    "iframeTitle": "YouTube video",
+    "like": "Like",
+    "unlike": "Unlike",
+    "openComments": "Open comments",
+    "added": "Added {date}",
+    "byArtist": "by {artist}"
+  },
+  "engagement": {
+    "likedBy": "Liked by",
+    "loading": "Loading...",
+    "noLikesYet": "No likes yet",
+    "addComment": "Add a comment",
+    "post": "Post",
+    "writeReply": "Write a reply",
+    "cancel": "Cancel",
+    "save": "Save",
+    "reply": "Reply",
+    "noCommentsYet": "No comments yet",
+    "editComment": "Edit comment",
+    "deleteComment": "Delete comment",
+    "likesComments": "{likes} likes · {comments} comments",
+    "track": "Track",
+    "errors": {
+      "failedToLoadLikes": "Failed to load likes",
+      "failedToLoadComments": "Failed to load comments",
+      "failedToPostComment": "Failed to post comment",
+      "failedToUpdateComment": "Failed to update comment",
+      "failedToDeleteComment": "Failed to delete comment",
+      "failedToUpdateLike": "Failed to update like",
+      "somethingWentWrong": "Something went wrong"
+    }
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "The playlist could not be loaded. Please try again in a moment.",
+    "tryAgain": "Try again"
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "common": {
+    "comingSoon": "ළඟදීම"
+  },
+  "home": {
+    "tagline": "ඔබේ ප්‍රිය සංගීතය බෙදාගන්න, FM crew ට ගිය සංගීතය සොයාගන්න",
+    "signInPrompt": "ඔබේ @{domain} Google ගිණුමෙන් ඇතුල් වන්න",
+    "auth": {
+      "notAllowedTitle": "ගිණුම අනුමත නොකෙරේ",
+      "notAllowedDescription": "ප්‍රවේශය @{domain} Google ගිණුම් සඳහා පමණි. ඉවත් වී අනුමත ගිණුමෙන් ඇතුල් වන්න."
+    }
+  },
+  "auth": {
+    "signIn": "Google සමඟ ඇතුල් වන්න",
+    "switchAccount": "ගිණුම මාරු කරන්න",
+    "signOut": "ඉවත් වන්න"
+  },
+  "loading": {
+    "message": "නවතම ලැයිස්තුව පූරණය වෙමින්..."
+  },
+  "settings": {
+    "ariaLabel": "ප්ලේලිස්ට් සැකසුම්",
+    "title": "සැකසුම්",
+    "playback": {
+      "sectionTitle": "ධාවන සැකසුම්",
+      "autoPlay": {
+        "label": "තෝරාගත් විට ආරම්භ කරන්න",
+        "description": "ටයිලයක් තෝරාගත් විට වීඩියෝව ස්වයංක්‍රීයව ධාවනය වේ"
+      }
+    },
+    "language": {
+      "sectionTitle": "භාෂාව",
+      "en": "English",
+      "ko": "한국어",
+      "id": "Bahasa Indonesia",
+      "si": "සිංහල",
+      "ta": "தமிழ்",
+      "vi": "Tiếng Việt"
+    }
+  },
+  "playlist": {
+    "allTracks": "සියලුම ගීත",
+    "sort": {
+      "newest": "නවතම",
+      "mostLiked": "වැඩිපුර ප්‍රිය"
+    },
+    "filter": {
+      "all": "සියල්ල"
+    },
+    "search": {
+      "placeholder": "නම, මාතෘකාව, ගායකයා...",
+      "ariaLabel": "ගීත සොයන්න",
+      "clearAriaLabel": "සෙවීම හිස් කරන්න"
+    },
+    "empty": {
+      "noMatchingTitle": "ගැළෙන ගීත නෑ",
+      "noMatchingDescription": "වෙනත් සෙවුම් පදයක් උත්සාහ කරන්න",
+      "noTracksTitle": "තවම ගීත නෑ",
+      "noTracksDescription": "මෙම මාසේ පළමු ගීතය එකතු කරන්න"
+    },
+    "notification": {
+      "newComment": "{name} ඔබේ ගීතයට නව අදහසක් ලිව්වා",
+      "dismissError": "දෝෂය ඉවත් කරන්න",
+      "dismissNotification": "දැනුම්දීම ඉවත් කරන්න"
+    },
+    "footer": {
+      "track": "{count, plural, one {# ගීතය} other {# ගීත}}",
+      "inPeriod": "{period} හි",
+      "total": "සම්පූර්ණ"
+    }
+  },
+  "addTrack": {
+    "button": "ගීතයක් එකතු කරන්න",
+    "title": "මෙම මාසේ ලැයිස්තුවට එකතු කරන්න",
+    "description": "YouTube සබැඳියක් ප්‍රජාව සමඟ බෙදාගන්න",
+    "youtubeUrlLabel": "YouTube URL",
+    "youtubeUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "descriptionLabel": "විස්තරය (අවශ්‍ය නොවේ)",
+    "descriptionPlaceholder": "මෙම ගීතය ඇයි?",
+    "submitButton": "ලැයිස්තුවට එකතු කරන්න",
+    "submittingButton": "එකතු කරමින්...",
+    "errors": {
+      "failedToAdd": "ගීතය එකතු කිරීමට අපොහොසත් විය",
+      "failedToRead": "එකතු කළ ගීතය කියවීමට අපොහොසත් විය",
+      "somethingWentWrong": "දෝෂයක් ඇති විය"
+    }
+  },
+  "videoPlayer": {
+    "iframeTitle": "YouTube වීඩියෝව",
+    "like": "ප්‍රිය කරන්න",
+    "unlike": "ප්‍රිය ඉවත් කරන්න",
+    "openComments": "අදහස් බලන්න",
+    "added": "{date} දින එකතු කළා",
+    "byArtist": "{artist} විසින්"
+  },
+  "engagement": {
+    "likedBy": "ප්‍රිය කළෝ",
+    "loading": "පූරණය වෙමින්...",
+    "noLikesYet": "තවම ප්‍රිය නෑ",
+    "addComment": "අදහසක් එකතු කරන්න",
+    "post": "ලියන්න",
+    "writeReply": "පිළිතුරු ලියන්න",
+    "cancel": "අවලංගු කරන්න",
+    "save": "සුරකින්න",
+    "reply": "පිළිතුරු",
+    "noCommentsYet": "තවම අදහස් නෑ",
+    "editComment": "අදහස සංස්කරණය කරන්න",
+    "deleteComment": "අදහස මකන්න",
+    "likesComments": "ප්‍රිය {likes} · අදහස් {comments}",
+    "track": "ගීතය",
+    "errors": {
+      "failedToLoadLikes": "ප්‍රිය පූරණය නොවීය",
+      "failedToLoadComments": "අදහස් පූරණය නොවීය",
+      "failedToPostComment": "අදහස ලිවීමට අපොහොසත් විය",
+      "failedToUpdateComment": "අදහස සංස්කරණය කිරීමට අපොහොසත් විය",
+      "failedToDeleteComment": "අදහස මැකීමට අපොහොසත් විය",
+      "failedToUpdateLike": "ප්‍රිය යාවත්කාලීන කිරීමට අපොහොසත් විය",
+      "somethingWentWrong": "දෝෂයක් ඇති විය"
+    }
+  },
+  "error": {
+    "title": "යම් දෝෂයක් සිදු විය",
+    "description": "ධාවන ලැයිස්තුව පූරණය කිරීමට නොහැකි විය. කරුණාකර මොහොතකින් නැවත උත්සාහ කරන්න.",
+    "tryAgain": "නැවත උත්සාහ කරන්න"
+  }
+}

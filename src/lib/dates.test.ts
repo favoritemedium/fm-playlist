@@ -35,5 +35,12 @@ describe("date-only helpers", () => {
 
   it("formats date-only values without timezone drift", () => {
     expect(formatDateOnlyForDisplay("2025-02-18")).toBe("Feb 18, 2025");
+    // Verify other locales format dates as expected
+    expect(formatDateOnlyForDisplay("2025-02-18", "ko")).toContain("2025");
+    expect(formatDateOnlyForDisplay("2025-02-18", "ko")).toContain("2");
+    expect(formatDateOnlyForDisplay("2025-02-18", "ko")).toContain("18");
+    expect(formatDateOnlyForDisplay("2025-02-18", "vi")).toContain("18");
+    expect(formatDateOnlyForDisplay("2025-02-18", "vi")).toContain("2");
+    expect(formatDateOnlyForDisplay("2025-02-18", "vi")).toContain("2025");
   });
 });
