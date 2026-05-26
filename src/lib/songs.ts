@@ -11,7 +11,8 @@ import {
 } from "./songs-db";
 import { compareDateOnlyDesc, getDateParts, toDateOnlyString } from "./dates";
 import { syncAppUserIdentity } from "./users-db";
-import { extractYouTubeId } from "./youtube";
+import { extractYouTubeId, fetchYouTubeOEmbed, parseYouTubeTitle } from "./youtube";
+import { getPool } from "./db";
 
 /** Normalize a composite key for dedup comparison. Trims whitespace,
  *  lowercases, and strips any time component from dates. */
@@ -37,6 +38,13 @@ export async function getAllSongs(user?: AppUser): Promise<Song[]> {
     airtableSongsPromise,
     fetchAllSongs(currentUserId),
   ]);
+
+  // Trigger background backfill if any DB song is missing metadata
+  if (dbSongs.some((s) => s.songTitle === null)) {
+    backfillSongMetadata(dbSongs).catch((err) => {
+      console.error("Background metadata backfill failed:", err);
+    });
+  }
 
   let syncedDbSongs = dbSongs;
 
@@ -114,6 +122,20 @@ export async function createSong(
     throw new Error("Invalid YouTube URL");
   }
 
+  let artistName: string | null = null;
+  let songTitle: string | null = null;
+
+  try {
+    const oembed = await fetchYouTubeOEmbed(videoId);
+    if (oembed) {
+      const parsed = parseYouTubeTitle(oembed.title, oembed.authorName);
+      artistName = parsed.artistName;
+      songTitle = parsed.songTitle;
+    }
+  } catch (err) {
+    console.error("Failed to fetch/parse YouTube metadata on creation:", err);
+  }
+
   const now = new Date();
   const submittedDate = toDateOnlyString(now);
   const { month, year } = getDateParts(submittedDate);
@@ -124,8 +146,8 @@ export async function createSong(
     submitter_user_id: user.id,
     submitter_name: user.name,
     submitter_email: user.email,
-    artist_name: null,
-    song_title: null,
+    artist_name: artistName,
+    song_title: songTitle,
     description: description || null,
     youtube_url: youtubeUrl,
     youtube_video_id: videoId,
@@ -133,4 +155,41 @@ export async function createSong(
     month,
     year,
   });
+}
+
+const backfillAttemptedVideoIds = new Set<string>();
+
+export async function backfillSongMetadata(songs: Song[]): Promise<void> {
+  const toBackfill = songs.filter(
+    (s) => s.songTitle === null && !backfillAttemptedVideoIds.has(s.youtubeVideoId)
+  );
+
+  if (toBackfill.length === 0) return;
+
+  const pool = getPool();
+  console.log(`[BACKFILL] Starting background backfill for ${toBackfill.length} songs`);
+
+  for (const song of toBackfill) {
+    backfillAttemptedVideoIds.add(song.youtubeVideoId);
+
+    const dbIdStr = song.id.replace(/^db_/, "");
+    const dbId = parseInt(dbIdStr, 10);
+    if (isNaN(dbId)) continue;
+
+    try {
+      const oembed = await fetchYouTubeOEmbed(song.youtubeVideoId);
+      if (oembed) {
+        const parsed = parseYouTubeTitle(oembed.title, oembed.authorName);
+        await pool.query(
+          "UPDATE songs SET artist_name = $1, song_title = $2 WHERE id = $3",
+          [parsed.artistName, parsed.songTitle, dbId]
+        );
+        console.log(`[BACKFILL] Successfully backfilled song ID ${dbId} ("${parsed.songTitle}")`);
+      } else {
+        console.warn(`[BACKFILL] No oEmbed data returned for video ID ${song.youtubeVideoId}`);
+      }
+    } catch (err) {
+      console.error(`[BACKFILL] Failed to backfill video ID ${song.youtubeVideoId}:`, err);
+    }
+  }
 }
