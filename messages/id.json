@@ -26,6 +26,10 @@
       "autoPlay": {
         "label": "Mulai putar saat dipilih",
         "description": "Video diputar otomatis saat tile dipilih"
+      },
+      "continuePlaying": {
+        "label": "Lanjutkan memutar playlist",
+        "description": "Setelah video selesai, putar video berikutnya yang tersedia di tile yang terlihat"
       }
     },
     "language": {

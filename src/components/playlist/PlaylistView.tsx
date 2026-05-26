@@ -63,6 +63,7 @@ interface SummaryResponse {
 }
 
 const AUTOPLAY_STORAGE_KEY = "fm-playlist-autoplay-enabled";
+const CONTINUE_PLAYING_STORAGE_KEY = "fm-playlist-continue-playing-enabled";
 
 export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
   const [songs, setSongs] = useState<Song[]>(initialSongs);
@@ -82,6 +83,7 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
   const [engagementError, setEngagementError] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<PlaylistNotification[]>([]);
   const [autoplayEnabled, setAutoplayEnabled] = useState(false);
+  const [continuePlaying, setContinuePlaying] = useState(false);
   const [shouldAutoplayActiveVideo, setShouldAutoplayActiveVideo] =
     useState(false);
   const t = useTranslations("playlist");
@@ -105,6 +107,10 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
       const savedAutoplay = window.localStorage.getItem(AUTOPLAY_STORAGE_KEY);
       if (savedAutoplay !== null) {
         setAutoplayEnabled(savedAutoplay === "true");
+      }
+      const savedContinuePlaying = window.localStorage.getItem(CONTINUE_PLAYING_STORAGE_KEY);
+      if (savedContinuePlaying !== null) {
+        setContinuePlaying(savedContinuePlaying === "true");
       }
     } catch {
       // Ignore unavailable localStorage, such as private browsing restrictions.
@@ -334,6 +340,35 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
     });
   }, []);
 
+  const handleContinuePlayingToggle = useCallback(() => {
+    setContinuePlaying((currentValue) => {
+      const nextValue = !currentValue;
+      try {
+        window.localStorage.setItem(
+          CONTINUE_PLAYING_STORAGE_KEY,
+          nextValue ? "true" : "false"
+        );
+      } catch {
+        // Ignore unavailable localStorage, such as private browsing restrictions.
+      }
+      return nextValue;
+    });
+  }, []);
+
+  const handleVideoEnd = useCallback(() => {
+    if (!continuePlaying || filteredSongs.length === 0) return;
+
+    const currentIndex = filteredSongs.findIndex(
+      (song) => song.id === currentActive?.id
+    );
+
+    if (currentIndex !== -1 && currentIndex + 1 < filteredSongs.length) {
+      const nextSong = filteredSongs[currentIndex + 1];
+      setActiveVideo(nextSong);
+      setShouldAutoplayActiveVideo(true);
+    }
+  }, [continuePlaying, filteredSongs, currentActive]);
+
   const handleYearChange = useCallback(
     (year: PlaylistFilterValue) => {
       setSelectedYear(year);
@@ -412,6 +447,8 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
               <PlaylistSettings
                 startPlayingWhenSelected={autoplayEnabled}
                 onStartPlayingWhenSelectedChange={handleAutoplayToggle}
+                continuePlayingPlaylist={continuePlaying}
+                onContinuePlayingPlaylistChange={handleContinuePlayingToggle}
               />
             </div>
           }
@@ -538,6 +575,7 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
                 isLikePending={pendingLikeSongIds.has(currentActive.id)}
                 onLikeToggle={handleLikeToggle}
                 onOpenEngagement={handleOpenEngagement}
+                onVideoEnd={handleVideoEnd}
               />
             )}
             <ThumbnailGrid

@@ -8,6 +8,8 @@ import { useTranslations } from "next-intl";
 interface PlaylistSettingsProps {
   startPlayingWhenSelected: boolean;
   onStartPlayingWhenSelectedChange: () => void;
+  continuePlayingPlaylist: boolean;
+  onContinuePlayingPlaylistChange: () => void;
 }
 
 function SettingToggle({
@@ -68,6 +70,8 @@ function SettingToggle({
 export function PlaylistSettings({
   startPlayingWhenSelected,
   onStartPlayingWhenSelectedChange,
+  continuePlayingPlaylist,
+  onContinuePlayingPlaylistChange,
 }: PlaylistSettingsProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -117,6 +121,14 @@ export function PlaylistSettings({
               description={t("playback.autoPlay.description")}
               checked={startPlayingWhenSelected}
               onChange={onStartPlayingWhenSelectedChange}
+              comingSoonLabel={tCommon("comingSoon")}
+            />
+            <SettingToggle
+              labelId="setting-continue-playing"
+              label={t("playback.continuePlaying.label")}
+              description={t("playback.continuePlaying.description")}
+              checked={continuePlayingPlaylist}
+              onChange={onContinuePlayingPlaylistChange}
               comingSoonLabel={tCommon("comingSoon")}
             />
           </div>

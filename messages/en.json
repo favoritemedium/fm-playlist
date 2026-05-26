@@ -26,6 +26,10 @@
       "autoPlay": {
         "label": "Start playing when selected",
         "description": "Video plays automatically when a tile is selected"
+      },
+      "continuePlaying": {
+        "label": "Continue playing the playlist",
+        "description": "Once a video is finished, play the next video available in the visible tiles"
       }
     },
     "language": {

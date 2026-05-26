@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { Heart, MessageSquare } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -15,6 +16,7 @@ interface VideoPlayerProps {
   isLikePending: boolean;
   onLikeToggle: (song: Song) => void;
   onOpenEngagement: (song: Song) => void;
+  onVideoEnd?: () => void;
 }
 
 export function VideoPlayer({
@@ -23,9 +25,36 @@ export function VideoPlayer({
   isLikePending,
   onLikeToggle,
   onOpenEngagement,
+  onVideoEnd,
 }: VideoPlayerProps) {
   const t = useTranslations("videoPlayer");
   const locale = useLocale();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (!event.origin.match(/^https?:\/\/(www\.)?youtube(-nocookie)?\.com$/)) {
+        return;
+      }
+
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        if (data.event === "infoDelivery" && data.info && data.info.playerState !== undefined) {
+          if (data.info.playerState === 0) {
+            onVideoEnd?.();
+          }
+        }
+      } catch {
+        // Ignore parsing errors
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [song.id, onVideoEnd]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -34,12 +63,25 @@ export function VideoPlayer({
     >
       <div className="relative aspect-video bg-black">
         <iframe
+          ref={iframeRef}
           key={song.id}
           src={getYouTubeEmbedUrl(song.youtubeVideoId, autoplay)}
           title={song.songTitle || t("iframeTitle")}
           className="absolute inset-0 w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
+          onLoad={() => {
+            if (iframeRef.current?.contentWindow) {
+              iframeRef.current.contentWindow.postMessage(
+                JSON.stringify({
+                  event: "listening",
+                  id: 1,
+                  channel: "widget",
+                }),
+                "*"
+              );
+            }
+          }}
         />
       </div>
       <div className="p-4 sm:p-6 space-y-3">

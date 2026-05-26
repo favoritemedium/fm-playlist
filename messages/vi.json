@@ -26,6 +26,10 @@
       "autoPlay": {
         "label": "Bắt đầu phát khi chọn",
         "description": "Video tự động phát khi chọn một ô"
+      },
+      "continuePlaying": {
+        "label": "Tiếp tục phát danh sách",
+        "description": "Khi một video kết thúc, phát video tiếp theo có sẵn trong các ô hiển thị"
       }
     },
     "language": {
