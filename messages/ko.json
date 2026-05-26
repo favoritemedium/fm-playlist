@@ -26,6 +26,10 @@
       "autoPlay": {
         "label": "선택 시 자동 재생",
         "description": "타일을 선택하면 동영상이 자동으로 재생됩니다"
+      },
+      "continuePlaying": {
+        "label": "플레이리스트 연속 재생",
+        "description": "동영상이 끝나면 표시된 타일의 다음 동영상을 재생합니다"
       }
     },
     "language": {

@@ -63,5 +63,5 @@ export function getYouTubeEmbedUrl(
   videoId: string,
   autoplay = false
 ): string {
-  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=${autoplay ? 1 : 0}`;
+  return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=${autoplay ? 1 : 0}&enablejsapi=1`;
 }
