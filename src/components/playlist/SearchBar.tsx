@@ -2,7 +2,6 @@
 
 import { Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Input } from "@/components/ui/input";
 
 interface SearchBarProps {
   value: string;
@@ -13,19 +12,22 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
   const t = useTranslations("playlist.search");
 
   return (
-    <div className="relative flex w-full sm:w-72">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-      <Input
+    <div className="relative flex items-center gap-2 bg-white px-3 sm:px-5 py-2 sm:py-3 rounded-xl shadow-md border border-border w-full sm:w-72">
+      <Search
+        className="w-5 h-5 text-secondary shrink-0"
+        strokeWidth={2.5}
+      />
+      <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t("placeholder")}
         aria-label={t("ariaLabel")}
-        className="pl-10 pr-10 bg-white border border-border shadow-md rounded-xl font-medium w-full h-full min-h-[44px]"
+        className="w-full bg-transparent border-0 p-0 text-sm font-semibold placeholder:text-muted-foreground focus:outline-none focus:ring-0 outline-none text-foreground"
       />
       {value && (
         <button
           onClick={() => onChange("")}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+          className="text-muted-foreground hover:text-foreground focus:outline-none shrink-0"
           aria-label={t("clearAriaLabel")}
           type="button"
         >

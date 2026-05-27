@@ -114,10 +114,10 @@ export function VideoPlayer({
               title={!isLoggedIn ? t("signInToLike", { domain: ALLOWED_EMAIL_DOMAIN, defaultValue: `Sign in with a ${ALLOWED_EMAIL_DOMAIN} account to like` }) : (song.userLiked ? t("unlike") : t("like"))}
               className={
                 song.userLiked
-                  ? "bg-primary hover:bg-primary/90 text-white font-bold"
+                  ? "bg-primary hover:bg-primary/90 text-white font-bold rounded-xl"
                   : !isLoggedIn
-                  ? "bg-white text-muted-foreground border-2 border-border font-bold opacity-60 cursor-not-allowed"
-                  : "bg-white text-foreground border-2 border-border hover:border-primary font-bold"
+                  ? "bg-white text-muted-foreground border-2 border-border font-bold opacity-60 cursor-not-allowed rounded-xl"
+                  : "bg-white text-foreground border-2 border-border hover:border-primary font-bold rounded-xl"
               }
             >
               <Heart
@@ -131,7 +131,7 @@ export function VideoPlayer({
             type="button"
             onClick={() => onOpenEngagement(song)}
             title={t("openComments")}
-            className="bg-white text-foreground border-2 border-border hover:border-secondary font-bold"
+            className="bg-white text-foreground border-2 border-border hover:border-secondary font-bold rounded-xl"
           >
             <MessageSquare className="size-4 text-secondary" />
             {song.commentCount}

@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowDownUp, Bell, X, AlertTriangle } from "lucide-react";
-import { SignInButton, SignOutButton } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/nextjs";
 import { PlaylistSettings } from "./PlaylistSettings";
 import { LanguageDropdown } from "./LanguageDropdown";
 import type {
@@ -95,7 +95,6 @@ export function PlaylistView({ initialSongs, user, isForbidden = false }: Playli
   const tEngagement = useTranslations("engagement");
   const tHome = useTranslations("home");
   const tAuth = useTranslations("auth");
-  const tAddTrack = useTranslations("addTrack");
 
   const {
     availableYears,
