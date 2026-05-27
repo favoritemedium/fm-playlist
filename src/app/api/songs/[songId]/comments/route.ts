@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { authorizeApiRequest } from "@/lib/api-auth";
+import { getCurrentAppAuth } from "@/lib/auth";
 import {
   createSongComment,
   fetchSongComments,
@@ -26,8 +27,8 @@ async function parseSongId(context: SongCommentsRouteContext) {
 
 export async function GET(_request: Request, context: SongCommentsRouteContext) {
   try {
-    const { appAuth, response } = await authorizeApiRequest();
-    if (response) return response;
+    const appAuth = await getCurrentAppAuth();
+    const user = appAuth.status === "authenticated" ? appAuth.user : null;
 
     const parsedSongId = await parseSongId(context);
     if (!parsedSongId.success) {
@@ -38,11 +39,13 @@ export async function GET(_request: Request, context: SongCommentsRouteContext) 
       );
     }
 
-    await syncAppUserIdentity(appAuth.user);
+    if (user) {
+      await syncAppUserIdentity(user);
+    }
 
     const [comments, summary] = await Promise.all([
-      fetchSongComments(parsedSongId.data, appAuth.user.id),
-      fetchSongEngagementSummary(parsedSongId.data, appAuth.user.id),
+      fetchSongComments(parsedSongId.data, user?.id ?? null),
+      fetchSongEngagementSummary(parsedSongId.data, user?.id ?? null),
     ]);
 
     return NextResponse.json({ comments, summary });

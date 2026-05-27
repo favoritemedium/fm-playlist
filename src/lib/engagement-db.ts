@@ -108,7 +108,7 @@ export async function fetchSongSubmitterUserId(
 
 export async function fetchSongEngagementSummary(
   songId: number,
-  currentUserId: string
+  currentUserId: string | null = null
 ): Promise<SongEngagementSummary> {
   await ensureSchema();
 
@@ -116,9 +116,12 @@ export async function fetchSongEngagementSummary(
     `SELECT s.id AS song_id,
        COALESCE(l.like_count, 0)::int AS like_count,
        COALESCE(c.comment_count, 0)::int AS comment_count,
-       EXISTS (
-         SELECT 1 FROM song_likes ul
-         WHERE ul.song_id = s.id AND ul.user_id = $2
+       (
+         $2::text IS NOT NULL
+         AND EXISTS (
+           SELECT 1 FROM song_likes ul
+           WHERE ul.song_id = s.id AND ul.user_id = $2
+         )
        ) AS user_liked
      FROM songs s
      LEFT JOIN (
@@ -196,7 +199,7 @@ export async function setSongLiked(
 
 export async function fetchSongComments(
   songId: number,
-  currentUserId: string
+  currentUserId: string | null = null
 ): Promise<SongComment[]> {
   await ensureSchema();
   await ensureSongExists(songId);
@@ -219,7 +222,7 @@ export async function fetchSongComments(
   const replyRows: CommentRow[] = [];
 
   for (const row of result.rows) {
-    const canModify = row.user_id === currentUserId;
+    const canModify = currentUserId !== null && row.user_id === currentUserId;
 
     if (row.parent_comment_id === null) {
       topLevelComments.set(row.id, {

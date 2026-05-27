@@ -87,7 +87,8 @@
       "failedToAdd": "트랙 추가 실패",
       "failedToRead": "추가된 트랙을 불러오지 못했습니다",
       "somethingWentWrong": "오류가 발생했습니다"
-    }
+    },
+    "signInToAddTrack": "{domain} 계정으로 로그인하여 트랙 추가"
   },
   "videoPlayer": {
     "iframeTitle": "YouTube 동영상",
@@ -95,7 +96,8 @@
     "unlike": "좋아요 취소",
     "openComments": "댓글 열기",
     "added": "{date} 추가됨",
-    "byArtist": "{artist}"
+    "byArtist": "{artist}",
+    "signInToLike": "{domain} 계정으로 로그인하여 좋아요 누르기"
   },
   "engagement": {
     "likedBy": "좋아요를 누른 사람",
@@ -120,7 +122,9 @@
       "failedToDeleteComment": "댓글 삭제 실패",
       "failedToUpdateLike": "좋아요 업데이트 실패",
       "somethingWentWrong": "오류가 발생했습니다"
-    }
+    },
+    "signInToLike": "{domain} 계정으로 로그인하여 좋아요 누르기",
+    "signInToInteract": "{domain} 계정으로 로그인하여 트랙 추가 / 좋아요 / 댓글 작성"
   },
   "error": {
     "title": "문제가 발생했습니다",

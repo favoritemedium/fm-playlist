@@ -31,11 +31,9 @@ export function Header({ user, settings }: HeaderProps) {
             {t("tagline")}
           </p>
         </div>
-        {user && (
-          <div className="shrink-0 self-start sm:self-center">
-            <UserMenu user={user} settings={settings} />
-          </div>
-        )}
+        <div className="shrink-0 self-start sm:self-center">
+          <UserMenu user={user} settings={settings} />
+        </div>
       </div>
     </motion.header>
   );

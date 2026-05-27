@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { authorizeApiRequest } from "@/lib/api-auth";
+import { getCurrentAppAuth } from "@/lib/auth";
 import {
   fetchSongEngagementSummary,
   fetchSongLikers,
@@ -21,8 +22,8 @@ async function parseSongId(context: SongLikesRouteContext) {
 
 export async function GET(_request: Request, context: SongLikesRouteContext) {
   try {
-    const { appAuth, response } = await authorizeApiRequest();
-    if (response) return response;
+    const appAuth = await getCurrentAppAuth();
+    const user = appAuth.status === "authenticated" ? appAuth.user : null;
 
     const parsedSongId = await parseSongId(context);
     if (!parsedSongId.success) {
@@ -33,10 +34,12 @@ export async function GET(_request: Request, context: SongLikesRouteContext) {
       );
     }
 
-    await syncAppUserIdentity(appAuth.user);
+    if (user) {
+      await syncAppUserIdentity(user);
+    }
 
     const [summary, likers] = await Promise.all([
-      fetchSongEngagementSummary(parsedSongId.data, appAuth.user.id),
+      fetchSongEngagementSummary(parsedSongId.data, user?.id ?? null),
       fetchSongLikers(parsedSongId.data),
     ]);
 

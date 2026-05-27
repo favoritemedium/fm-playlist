@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { authorizeApiRequest } from "@/lib/api-auth";
+import { getCurrentAppAuth } from "@/lib/auth";
 import { getAllSongs, createSong } from "@/lib/songs";
 import { makeApiError } from "@/lib/api";
 import { createSongInputSchema } from "@/lib/validation";
 
 export async function GET() {
   try {
-    const { appAuth, response } = await authorizeApiRequest();
-    if (response) return response;
+    const appAuth = await getCurrentAppAuth();
+    const user = appAuth.status === "authenticated" ? appAuth.user : null;
 
-    const songs = await getAllSongs(appAuth.user);
+    const songs = await getAllSongs(user ?? undefined);
     return NextResponse.json(songs);
   } catch (error) {
     console.error("Failed to fetch songs:", error);

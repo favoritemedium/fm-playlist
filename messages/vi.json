@@ -11,7 +11,7 @@
     }
   },
   "auth": {
-    "signIn": "Đăng nhập bằng Google",
+    "signIn": "Đăng nhập qua Google",
     "switchAccount": "Chuyển tài khoản",
     "signOut": "Đăng xuất"
   },
@@ -87,7 +87,8 @@
       "failedToAdd": "Không thể thêm bài hát",
       "failedToRead": "Không thể đọc bài hát vừa thêm",
       "somethingWentWrong": "Có lỗi xảy ra"
-    }
+    },
+    "signInToAddTrack": "Đăng nhập bằng tài khoản {domain} để thêm bài hát"
   },
   "videoPlayer": {
     "iframeTitle": "Video YouTube",
@@ -95,7 +96,8 @@
     "unlike": "Bỏ thích",
     "openComments": "Mở bình luận",
     "added": "Đã thêm {date}",
-    "byArtist": "bởi {artist}"
+    "byArtist": "bởi {artist}",
+    "signInToLike": "Đăng nhập bằng tài khoản {domain} để thích"
   },
   "engagement": {
     "likedBy": "Được thích bởi",
@@ -120,7 +122,9 @@
       "failedToDeleteComment": "Không thể xóa bình luận",
       "failedToUpdateLike": "Không thể cập nhật lượt thích",
       "somethingWentWrong": "Có lỗi xảy ra"
-    }
+    },
+    "signInToLike": "Đăng nhập bằng tài khoản {domain} để thích",
+    "signInToInteract": "Đăng nhập bằng tài khoản {domain} để thêm bài hát / thích / bình luận"
   },
   "error": {
     "title": "Có lỗi xảy ra",

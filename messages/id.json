@@ -11,7 +11,7 @@
     }
   },
   "auth": {
-    "signIn": "Masuk dengan Google",
+    "signIn": "Masuk via Google",
     "switchAccount": "Ganti akun",
     "signOut": "Keluar"
   },
@@ -87,7 +87,8 @@
       "failedToAdd": "Gagal menambahkan lagu",
       "failedToRead": "Gagal membaca lagu yang ditambahkan",
       "somethingWentWrong": "Terjadi kesalahan"
-    }
+    },
+    "signInToAddTrack": "Masuk dengan akun {domain} untuk menambahkan lagu"
   },
   "videoPlayer": {
     "iframeTitle": "Video YouTube",
@@ -95,7 +96,8 @@
     "unlike": "Batal suka",
     "openComments": "Buka komentar",
     "added": "Ditambahkan {date}",
-    "byArtist": "oleh {artist}"
+    "byArtist": "oleh {artist}",
+    "signInToLike": "Masuk dengan akun {domain} untuk menyukai"
   },
   "engagement": {
     "likedBy": "Disukai oleh",
@@ -120,7 +122,9 @@
       "failedToDeleteComment": "Gagal menghapus komentar",
       "failedToUpdateLike": "Gagal memperbarui suka",
       "somethingWentWrong": "Terjadi kesalahan"
-    }
+    },
+    "signInToLike": "Masuk dengan akun {domain} untuk menyukai",
+    "signInToInteract": "Masuk dengan akun {domain} untuk menambahkan lagu / menyukai / berkomentar"
   },
   "error": {
     "title": "Terjadi kesalahan",
