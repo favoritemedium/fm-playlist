@@ -196,6 +196,7 @@ function CommentEntry({
                   size="sm"
                   disabled={isSaving || !editBody.trim()}
                   onClick={handleSave}
+                  className="rounded-xl font-bold"
                 >
                   {t("save")}
                 </Button>
@@ -403,10 +404,10 @@ export function EngagementDialog({
                 title={!isLoggedIn ? t("signInToLike", { domain: ALLOWED_EMAIL_DOMAIN, defaultValue: `Sign in with a ${ALLOWED_EMAIL_DOMAIN} account to like` }) : (song.userLiked ? t("unlike") : t("like"))}
                 className={
                   song.userLiked
-                    ? "bg-primary hover:bg-primary/90 text-white font-bold"
+                    ? "bg-primary hover:bg-primary/90 text-white font-bold rounded-xl"
                     : !isLoggedIn
-                    ? "bg-white text-muted-foreground border-2 border-border font-bold opacity-60 cursor-not-allowed"
-                    : "bg-white text-foreground border-2 border-border hover:border-primary font-bold"
+                    ? "bg-white text-muted-foreground border-2 border-border font-bold opacity-60 cursor-not-allowed rounded-xl"
+                    : "bg-white text-foreground border-2 border-border hover:border-primary font-bold rounded-xl"
                 }
               >
                 <Heart
@@ -485,7 +486,7 @@ export function EngagementDialog({
                       type="button"
                       disabled={isSubmitting || !newComment.trim()}
                       onClick={() => void submitComment(null)}
-                      className="bg-primary hover:bg-primary/90 text-white font-bold"
+                      className="bg-primary hover:bg-primary/90 text-white font-bold rounded-xl"
                     >
                       <Send className="size-4" />
                       {t("post")}
@@ -542,17 +543,18 @@ export function EngagementDialog({
                                 >
                                   {t("cancel")}
                                 </Button>
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  disabled={
-                                    isSubmitting ||
-                                    !(replyBodies[comment.id] ?? "").trim()
-                                  }
-                                  onClick={() => void submitComment(comment.id)}
-                                >
-                                  {t("reply")}
-                                </Button>
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    disabled={
+                                      isSubmitting ||
+                                      !(replyBodies[comment.id] ?? "").trim()
+                                    }
+                                    onClick={() => void submitComment(comment.id)}
+                                    className="rounded-xl font-bold"
+                                  >
+                                    {t("reply")}
+                                  </Button>
                               </div>
                             </div>
                           </div>

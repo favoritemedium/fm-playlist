@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { timingSafeEqual, createHash } from "crypto";
 import { makeApiError } from "@/lib/api";
 import { getReminderCronSecret } from "@/lib/reminder-config";
 
@@ -18,6 +19,12 @@ function getBearerToken(headers: Headers): string | null {
   return token;
 }
 
+function timingSafeStringEqual(a: string, b: string): boolean {
+  const hashA = createHash("sha256").update(a).digest();
+  const hashB = createHash("sha256").update(b).digest();
+  return timingSafeEqual(hashA, hashB);
+}
+
 export function authorizeCronRequest(
   request: Pick<Request, "headers">,
   env: CronAuthEnv = process.env
@@ -34,7 +41,9 @@ export function authorizeCronRequest(
     };
   }
 
-  if (getBearerToken(request.headers) !== cronSecret) {
+  const token = getBearerToken(request.headers);
+
+  if (!token || !timingSafeStringEqual(token, cronSecret)) {
     return {
       authorized: false,
       response: NextResponse.json(

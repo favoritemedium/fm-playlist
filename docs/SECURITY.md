@@ -46,7 +46,8 @@ deployment environment variable.
 Scheduled reminder endpoints use `Authorization: Bearer <REMINDER_CRON_SECRET>`
 instead of Clerk, because cron calls are not user sessions. Use a long random
 secret, keep it out of client-visible variables, and rotate it if scheduler
-configuration is shared too broadly.
+configuration is shared too broadly. Verification of this token is timing-safe
+(via a SHA-256 hash comparison using `crypto.timingSafeEqual`) to prevent timing-based side-channel leaks.
 
 ## Input Validation
 
