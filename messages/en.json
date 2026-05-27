@@ -11,7 +11,7 @@
     }
   },
   "auth": {
-    "signIn": "Sign in with Google",
+    "signIn": "Sign in via Google",
     "switchAccount": "Switch account",
     "signOut": "Sign out"
   },
@@ -87,7 +87,8 @@
       "failedToAdd": "Failed to add track",
       "failedToRead": "Failed to read added track",
       "somethingWentWrong": "Something went wrong"
-    }
+    },
+    "signInToAddTrack": "Sign in with a {domain} account to add a track"
   },
   "videoPlayer": {
     "iframeTitle": "YouTube video",
@@ -95,7 +96,8 @@
     "unlike": "Unlike",
     "openComments": "Open comments",
     "added": "Added {date}",
-    "byArtist": "by {artist}"
+    "byArtist": "by {artist}",
+    "signInToLike": "Sign in with a {domain} account to like"
   },
   "engagement": {
     "likedBy": "Liked by",
@@ -120,7 +122,9 @@
       "failedToDeleteComment": "Failed to delete comment",
       "failedToUpdateLike": "Failed to update like",
       "somethingWentWrong": "Something went wrong"
-    }
+    },
+    "signInToLike": "Sign in with a {domain} account to like",
+    "signInToInteract": "Sign in with a {domain} account to add a track / like / comment"
   },
   "error": {
     "title": "Something went wrong",

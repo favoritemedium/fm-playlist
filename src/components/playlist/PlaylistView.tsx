@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
-import { ArrowDownUp, Bell, X } from "lucide-react";
+import { ArrowDownUp, Bell, X, AlertTriangle } from "lucide-react";
+import { SignInButton, SignOutButton } from "@clerk/nextjs";
 import { PlaylistSettings } from "./PlaylistSettings";
 import { LanguageDropdown } from "./LanguageDropdown";
 import type {
@@ -16,7 +17,10 @@ import {
   getCurrentYear,
   isAllFilterValue,
   type PlaylistFilterValue,
+  ALLOWED_EMAIL_DOMAIN,
 } from "@/lib/constants";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MonthYearFilter } from "./MonthYearFilter";
@@ -48,6 +52,7 @@ interface PlaylistViewProps {
     picture?: string;
     email?: string;
   } | null;
+  isForbidden?: boolean;
 }
 
 interface PlaylistNotification {
@@ -65,7 +70,7 @@ interface SummaryResponse {
 const AUTOPLAY_STORAGE_KEY = "fm-playlist-autoplay-enabled";
 const CONTINUE_PLAYING_STORAGE_KEY = "fm-playlist-continue-playing-enabled";
 
-export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
+export function PlaylistView({ initialSongs, user, isForbidden = false }: PlaylistViewProps) {
   const [songs, setSongs] = useState<Song[]>(initialSongs);
   const [selectedYear, setSelectedYear] = useState<PlaylistFilterValue>(
     getCurrentYear()
@@ -88,6 +93,9 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
     useState(false);
   const t = useTranslations("playlist");
   const tEngagement = useTranslations("engagement");
+  const tHome = useTranslations("home");
+  const tAuth = useTranslations("auth");
+  const tAddTrack = useTranslations("addTrack");
 
   const {
     availableYears,
@@ -239,7 +247,7 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
 
   const handleLikeToggle = useCallback(
     async (song: Song) => {
-      if (pendingLikeSongIds.has(song.id)) return;
+      if (!user || pendingLikeSongIds.has(song.id)) return;
 
       const nextLiked = !song.userLiked;
       const previousSummary: SongEngagementSummary = {
@@ -454,6 +462,32 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
           }
         />
 
+        {isForbidden && (
+          <Alert
+            variant="destructive"
+            className="border-2 border-destructive bg-destructive/5 text-left mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl shadow-lg"
+          >
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+              <div>
+                <AlertTitle className="text-sm font-black text-destructive leading-tight mb-0.5">
+                  {tHome("auth.notAllowedTitle")}
+                </AlertTitle>
+                <AlertDescription className="text-xs font-semibold text-destructive/80 leading-normal">
+                  {tHome("auth.notAllowedDescription", { domain: ALLOWED_EMAIL_DOMAIN })}
+                </AlertDescription>
+              </div>
+            </div>
+            <div className="flex gap-2 shrink-0 self-end md:self-center">
+              <SignOutButton>
+                <Button size="sm" className="bg-destructive hover:bg-destructive/90 text-white font-bold text-xs py-1 h-8 rounded-xl cursor-pointer shadow-lg shadow-destructive/20">
+                  {tAuth("signOut")}
+                </Button>
+              </SignOutButton>
+            </div>
+          </Alert>
+        )}
+
         {/* Controls */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -492,11 +526,12 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
 
           </div>
 
-          {user && (
-            <div className="w-full lg:w-auto">
-              <AddTrackDialog onTrackAdded={handleTrackAdded} />
-            </div>
-          )}
+          <div className="w-full lg:w-auto">
+            <AddTrackDialog
+              onTrackAdded={handleTrackAdded}
+              isLoggedIn={Boolean(user) && !isForbidden}
+            />
+          </div>
         </motion.div>
 
         {(engagementError || notifications.length > 0) && (
@@ -559,8 +594,10 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
                 ? t("empty.noMatchingDescription")
                 : t("empty.noTracksDescription")}
             </p>
-            {!searchQuery && user && (
-              <AddTrackDialog onTrackAdded={handleTrackAdded} />
+            {!searchQuery && (
+              <div className="flex justify-center">
+                <AddTrackDialog onTrackAdded={handleTrackAdded} isLoggedIn={Boolean(user)} />
+              </div>
             )}
           </motion.div>
         ) : (
@@ -573,6 +610,7 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
                   activeVideo?.id === currentActive.id
                 }
                 isLikePending={pendingLikeSongIds.has(currentActive.id)}
+                isLoggedIn={Boolean(user) && !isForbidden}
                 onLikeToggle={handleLikeToggle}
                 onOpenEngagement={handleOpenEngagement}
                 onVideoEnd={handleVideoEnd}
@@ -597,6 +635,7 @@ export function PlaylistView({ initialSongs, user }: PlaylistViewProps) {
           isLikePending={
             engagementSong ? pendingLikeSongIds.has(engagementSong.id) : false
           }
+          isLoggedIn={Boolean(user) && !isForbidden}
           onOpenChange={(open) => {
             if (!open) setEngagementSongId(null);
           }}

@@ -11,7 +11,7 @@
     }
   },
   "auth": {
-    "signIn": "Google සමඟ ඇතුල් වන්න",
+    "signIn": "Sign in via Google",
     "switchAccount": "ගිණුම මාරු කරන්න",
     "signOut": "ඉවත් වන්න"
   },
@@ -87,7 +87,8 @@
       "failedToAdd": "ගීතය එකතු කිරීමට අපොහොසත් විය",
       "failedToRead": "එකතු කළ ගීතය කියවීමට අපොහොසත් විය",
       "somethingWentWrong": "දෝෂයක් ඇති විය"
-    }
+    },
+    "signInToAddTrack": "Sign in with a {domain} account to add a track"
   },
   "videoPlayer": {
     "iframeTitle": "YouTube වීඩියෝව",
@@ -95,7 +96,8 @@
     "unlike": "ප්‍රිය ඉවත් කරන්න",
     "openComments": "අදහස් බලන්න",
     "added": "{date} දින එකතු කළා",
-    "byArtist": "{artist} විසින්"
+    "byArtist": "{artist} විසින්",
+    "signInToLike": "Sign in with a {domain} account to like"
   },
   "engagement": {
     "likedBy": "ප්‍රිය කළෝ",
@@ -104,7 +106,7 @@
     "addComment": "අදහසක් එකතු කරන්න",
     "post": "ලියන්න",
     "writeReply": "පිළිතුරු ලියන්න",
-    "cancel": "අවලංගු කරන්න",
+    "cancel": "අවලංගု කරන්න",
     "save": "සුරකින්න",
     "reply": "පිළිතුරු",
     "noCommentsYet": "තවම අදහස් නෑ",
@@ -120,7 +122,9 @@
       "failedToDeleteComment": "අදහස මැකීමට අපොහොසත් විය",
       "failedToUpdateLike": "ප්‍රිය යාවත්කාලීන කිරීමට අපොහොසත් විය",
       "somethingWentWrong": "දෝෂයක් ඇති විය"
-    }
+    },
+    "signInToLike": "Sign in with a {domain} account to like",
+    "signInToInteract": "Sign in with a {domain} account to add a track / like / comment"
   },
   "error": {
     "title": "යම් දෝෂයක් සිදු විය",

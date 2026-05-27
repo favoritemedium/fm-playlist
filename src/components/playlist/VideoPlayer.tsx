@@ -9,11 +9,13 @@ import { formatDateOnlyForDisplay } from "@/lib/dates";
 import { getYouTubeEmbedUrl } from "@/lib/youtube";
 import { Button } from "@/components/ui/button";
 import { LikesTooltip } from "./LikesTooltip";
+import { ALLOWED_EMAIL_DOMAIN } from "@/lib/constants";
 
 interface VideoPlayerProps {
   song: Song;
   autoplay?: boolean;
   isLikePending: boolean;
+  isLoggedIn?: boolean;
   onLikeToggle: (song: Song) => void;
   onOpenEngagement: (song: Song) => void;
   onVideoEnd?: () => void;
@@ -23,6 +25,7 @@ export function VideoPlayer({
   song,
   autoplay = false,
   isLikePending,
+  isLoggedIn = false,
   onLikeToggle,
   onOpenEngagement,
   onVideoEnd,
@@ -106,12 +109,14 @@ export function VideoPlayer({
           <LikesTooltip songId={song.id} likeCount={song.likeCount}>
             <Button
               type="button"
-              disabled={isLikePending}
+              disabled={isLikePending || !isLoggedIn}
               onClick={() => onLikeToggle(song)}
-              title={song.userLiked ? t("unlike") : t("like")}
+              title={!isLoggedIn ? t("signInToLike", { domain: ALLOWED_EMAIL_DOMAIN, defaultValue: `Sign in with a ${ALLOWED_EMAIL_DOMAIN} account to like` }) : (song.userLiked ? t("unlike") : t("like"))}
               className={
                 song.userLiked
                   ? "bg-primary hover:bg-primary/90 text-white font-bold"
+                  : !isLoggedIn
+                  ? "bg-white text-muted-foreground border-2 border-border font-bold opacity-60 cursor-not-allowed"
                   : "bg-white text-foreground border-2 border-border hover:border-primary font-bold"
               }
             >

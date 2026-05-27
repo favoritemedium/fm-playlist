@@ -11,7 +11,7 @@
     }
   },
   "auth": {
-    "signIn": "Google மூலம் உள்நுழையுங்கள்",
+    "signIn": "Sign in via Google",
     "switchAccount": "கணக்கை மாற்றுங்கள்",
     "signOut": "வெளியேறு"
   },
@@ -87,7 +87,8 @@
       "failedToAdd": "பாடல் சேர்க்கத் தவறியது",
       "failedToRead": "சேர்க்கப்பட்ட பாடலை படிக்கத் தவறியது",
       "somethingWentWrong": "ஏதோ தவறு நடந்தது"
-    }
+    },
+    "signInToAddTrack": "Sign in with a {domain} account to add a track"
   },
   "videoPlayer": {
     "iframeTitle": "YouTube வீடியோ",
@@ -95,7 +96,8 @@
     "unlike": "விரும்புதல் நீக்கு",
     "openComments": "கருத்துகளைத் திற",
     "added": "{date} இல் சேர்க்கப்பட்டது",
-    "byArtist": "{artist} ஆல்"
+    "byArtist": "{artist} ஆல்",
+    "signInToLike": "Sign in with a {domain} account to like"
   },
   "engagement": {
     "likedBy": "விரும்பியவர்கள்",
@@ -120,7 +122,9 @@
       "failedToDeleteComment": "கருத்தை நீக்கத் தவறியது",
       "failedToUpdateLike": "விரும்பலை புதுப்பிக்கத் தவறியது",
       "somethingWentWrong": "ஏதோ தவறு நடந்தது"
-    }
+    },
+    "signInToLike": "Sign in with a {domain} account to like",
+    "signInToInteract": "Sign in with a {domain} account to add a track / like / comment"
   },
   "error": {
     "title": "ஏதோ தவறு நடந்துவிட்டது",

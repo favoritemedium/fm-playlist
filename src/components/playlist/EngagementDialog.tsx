@@ -12,6 +12,8 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
+import { SignInButton } from "@clerk/nextjs";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import type {
   EngagementUser,
   Song,
@@ -23,6 +25,7 @@ import type {
 import { SONG_COMMENT_MAX_LENGTH } from "@/lib/song-limits";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { ALLOWED_EMAIL_DOMAIN } from "@/lib/constants";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +39,7 @@ interface EngagementDialogProps {
   song: Song | null;
   open: boolean;
   isLikePending: boolean;
+  isLoggedIn?: boolean;
   onOpenChange: (open: boolean) => void;
   onLikeToggle: (song: Song) => void;
   onSummaryChange: (summary: SongEngagementSummary) => void;
@@ -239,6 +243,7 @@ export function EngagementDialog({
   song,
   open,
   isLikePending,
+  isLoggedIn = false,
   onOpenChange,
   onLikeToggle,
   onSummaryChange,
@@ -252,6 +257,7 @@ export function EngagementDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations("engagement");
+  const tAuth = useTranslations("auth");
 
   const refresh = useCallback(async () => {
     if (!song) return;
@@ -392,11 +398,14 @@ export function EngagementDialog({
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 type="button"
-                disabled={isLikePending}
+                disabled={isLikePending || !isLoggedIn}
                 onClick={() => onLikeToggle(song)}
+                title={!isLoggedIn ? t("signInToLike", { domain: ALLOWED_EMAIL_DOMAIN, defaultValue: `Sign in with a ${ALLOWED_EMAIL_DOMAIN} account to like` }) : (song.userLiked ? t("unlike") : t("like"))}
                 className={
                   song.userLiked
                     ? "bg-primary hover:bg-primary/90 text-white font-bold"
+                    : !isLoggedIn
+                    ? "bg-white text-muted-foreground border-2 border-border font-bold opacity-60 cursor-not-allowed"
                     : "bg-white text-foreground border-2 border-border hover:border-primary font-bold"
                 }
               >
@@ -439,30 +448,51 @@ export function EngagementDialog({
             </section>
 
             <section className="space-y-4">
-              <div className="space-y-2">
-                <Textarea
-                  value={newComment}
-                  onChange={(event) => setNewComment(event.target.value)}
-                  placeholder={t("addComment")}
-                  rows={3}
-                  maxLength={SONG_COMMENT_MAX_LENGTH}
-                  className="bg-input-background resize-none border-2 border-border focus:border-primary"
-                />
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs text-muted-foreground font-semibold">
-                    {newComment.length}/{SONG_COMMENT_MAX_LENGTH}
-                  </span>
-                  <Button
-                    type="button"
-                    disabled={isSubmitting || !newComment.trim()}
-                    onClick={() => void submitComment(null)}
-                    className="bg-primary hover:bg-primary/90 text-white font-bold"
-                  >
-                    <Send className="size-4" />
-                    {t("post")}
-                  </Button>
+               {!isLoggedIn ? (
+                <div className="bg-primary/5 rounded-2xl p-6 border border-primary/10 text-center space-y-3 shadow-inner">
+                  <p className="text-sm font-bold text-muted-foreground leading-relaxed">
+                    {t("signInToInteract", {
+                      domain: ALLOWED_EMAIL_DOMAIN,
+                      defaultValue: `Sign in with a ${ALLOWED_EMAIL_DOMAIN} account to add a track / like / comment`,
+                    })}
+                  </p>
+                  <div className="flex justify-center">
+                    <SignInButton forceRedirectUrl="/" signUpForceRedirectUrl="/">
+                      <Button
+                        className="bg-white hover:bg-neutral-50 text-foreground border border-border shadow-sm font-bold px-4 py-2 flex items-center gap-2 rounded-xl text-xs cursor-pointer transition-all hover:border-neutral-300 shadow-lg shadow-black/5"
+                      >
+                        <GoogleIcon className="w-4 h-4 shrink-0" />
+                        <span>{tAuth("signIn")}</span>
+                      </Button>
+                    </SignInButton>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-2">
+                  <Textarea
+                    value={newComment}
+                    onChange={(event) => setNewComment(event.target.value)}
+                    placeholder={t("addComment")}
+                    rows={3}
+                    maxLength={SONG_COMMENT_MAX_LENGTH}
+                    className="bg-input-background resize-none border-2 border-border focus:border-primary"
+                  />
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold">
+                      {newComment.length}/{SONG_COMMENT_MAX_LENGTH}
+                    </span>
+                    <Button
+                      type="button"
+                      disabled={isSubmitting || !newComment.trim()}
+                      onClick={() => void submitComment(null)}
+                      className="bg-primary hover:bg-primary/90 text-white font-bold"
+                    >
+                      <Send className="size-4" />
+                      {t("post")}
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               {error && (
                 <p role="alert" className="text-sm font-semibold text-destructive">
@@ -526,7 +556,7 @@ export function EngagementDialog({
                               </div>
                             </div>
                           </div>
-                        ) : (
+                        ) : isLoggedIn ? (
                           <button
                             type="button"
                             onClick={() => setActiveReplyId(comment.id)}
@@ -535,7 +565,7 @@ export function EngagementDialog({
                             <Reply className="size-3.5" />
                             {t("reply")}
                           </button>
-                        )}
+                        ) : null}
                       </div>
                       {comment.replies.length > 0 && (
                         <div className="space-y-3">

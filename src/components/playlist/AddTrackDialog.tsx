@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { SignInButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
+import { ALLOWED_EMAIL_DOMAIN } from "@/lib/constants";
 import {
   SONG_DESCRIPTION_MAX_LENGTH,
   YOUTUBE_URL_MAX_LENGTH,
@@ -22,9 +25,10 @@ import type { Song } from "@/types/song";
 
 interface AddTrackDialogProps {
   onTrackAdded: (song: Song) => void;
+  isLoggedIn?: boolean;
 }
 
-export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
+export function AddTrackDialog({ onTrackAdded, isLoggedIn = false }: AddTrackDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +37,7 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
     description: "",
   });
   const t = useTranslations("addTrack");
+  const tAuth = useTranslations("auth");
 
   const errorId = "add-track-error";
 
@@ -96,64 +101,85 @@ export function AddTrackDialog({ onTrackAdded }: AddTrackDialogProps) {
             {t("description")}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-5 mt-4">
-          <div>
-            <label htmlFor="youtube-url" className="block mb-2 font-bold text-foreground">
-              {t("youtubeUrlLabel")}
-            </label>
-            <Input
-              id="youtube-url"
-              type="url"
-              inputMode="url"
-              autoComplete="off"
-              value={formData.youtubeUrl}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, youtubeUrl: e.target.value }))
-              }
-              placeholder={t("youtubeUrlPlaceholder")}
-              required
-              maxLength={YOUTUBE_URL_MAX_LENGTH}
-              aria-invalid={Boolean(error)}
-              aria-describedby={error ? errorId : undefined}
-              className="bg-input-background border-2 border-border focus:border-primary"
-            />
-          </div>
-          <div>
-            <label htmlFor="description" className="block mb-2 font-bold text-foreground">
-              {t("descriptionLabel")}
-            </label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              placeholder={t("descriptionPlaceholder")}
-              rows={3}
-              maxLength={SONG_DESCRIPTION_MAX_LENGTH}
-              className="bg-input-background resize-none border-2 border-border focus:border-primary"
-            />
-            <p className="mt-1 text-xs text-muted-foreground text-right">
-              {formData.description.length}/{SONG_DESCRIPTION_MAX_LENGTH}
+        {!isLoggedIn ? (
+          <div className="bg-primary/5 rounded-2xl p-6 border border-primary/10 text-center space-y-3.5 shadow-inner mt-4">
+            <p className="text-sm font-bold text-muted-foreground leading-relaxed">
+              {t("signInToAddTrack", {
+                domain: ALLOWED_EMAIL_DOMAIN,
+                defaultValue: `Sign in with a ${ALLOWED_EMAIL_DOMAIN} account to add a track`,
+              })}
             </p>
+            <div className="flex justify-center">
+              <SignInButton forceRedirectUrl="/" signUpForceRedirectUrl="/">
+                <Button
+                  className="bg-white hover:bg-neutral-50 text-foreground border border-border shadow-sm font-bold px-4 py-2 flex items-center gap-2 rounded-xl text-xs cursor-pointer transition-all hover:border-neutral-300 shadow-lg shadow-black/5"
+                >
+                  <GoogleIcon className="w-4 h-4 shrink-0" />
+                  <span>{tAuth("signIn")}</span>
+                </Button>
+              </SignInButton>
+            </div>
           </div>
-          {error && (
-            <p id={errorId} role="alert" className="text-sm text-destructive font-medium">
-              {error}
-            </p>
-          )}
-          <Button
-            type="submit"
-            disabled={isSubmitting || !formData.youtubeUrl.trim()}
-            aria-busy={isSubmitting}
-            className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-6 shadow-lg shadow-primary/30"
-          >
-            {isSubmitting ? t("submittingButton") : t("submitButton")}
-          </Button>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+            <div>
+              <label htmlFor="youtube-url" className="block mb-2 font-bold text-foreground">
+                {t("youtubeUrlLabel")}
+              </label>
+              <Input
+                id="youtube-url"
+                type="url"
+                inputMode="url"
+                autoComplete="off"
+                value={formData.youtubeUrl}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, youtubeUrl: e.target.value }))
+                }
+                placeholder={t("youtubeUrlPlaceholder")}
+                required
+                maxLength={YOUTUBE_URL_MAX_LENGTH}
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? errorId : undefined}
+                className="bg-input-background border-2 border-border focus:border-primary"
+              />
+            </div>
+            <div>
+              <label htmlFor="description" className="block mb-2 font-bold text-foreground">
+                {t("descriptionLabel")}
+              </label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                placeholder={t("descriptionPlaceholder")}
+                rows={3}
+                maxLength={SONG_DESCRIPTION_MAX_LENGTH}
+                className="bg-input-background resize-none border-2 border-border focus:border-primary"
+              />
+              <p className="mt-1 text-xs text-muted-foreground text-right">
+                {formData.description.length}/{SONG_DESCRIPTION_MAX_LENGTH}
+              </p>
+            </div>
+            {error && (
+              <p id={errorId} role="alert" className="text-sm text-destructive font-medium">
+                {error}
+              </p>
+            )}
+            <Button
+              type="submit"
+              disabled={isSubmitting || !formData.youtubeUrl.trim()}
+              aria-busy={isSubmitting}
+              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-6 shadow-lg shadow-primary/30"
+            >
+              {isSubmitting ? t("submittingButton") : t("submitButton")}
+            </Button>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
