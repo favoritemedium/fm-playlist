@@ -6,16 +6,23 @@ export interface SubmitterSummary {
 }
 
 export function getTopSubmitters(
-  songs: Pick<Song, "submitterName">[],
+  songs: (Pick<Song, "submitterName"> & Partial<Pick<Song, "submitterEmail" | "submitterUserId">>)[],
   limit = 3
 ): SubmitterSummary[] {
   const submitters = new Map<string, SubmitterSummary>();
+  const emailUserIds = new Map<string, string>();
+  for (const song of songs) {
+    const email = song.submitterEmail?.trim().toLowerCase();
+    if (email && song.submitterUserId) emailUserIds.set(email, song.submitterUserId);
+  }
 
   for (const song of songs) {
-    const name = song.submitterName.trim();
+    const name = song.submitterName.trim().replace(/\s+/g, " ");
     if (!name) continue;
 
-    const key = name.toLocaleLowerCase("en-US");
+    const email = song.submitterEmail?.trim().toLowerCase();
+    const userId = song.submitterUserId || (email ? emailUserIds.get(email) : undefined);
+    const key = userId ? `user:${userId}` : email ? `email:${email}` : `name:${name.toLocaleLowerCase("en-US")}`;
     const existing = submitters.get(key);
     if (existing) {
       existing.count += 1;

@@ -2,6 +2,14 @@ import { describe, expect, it } from "vitest";
 import { getTopSubmitters } from "./playlist-recap";
 
 describe("getTopSubmitters", () => {
+  it("combines reconciled emails with accounts while keeping namesakes separate", () => {
+    expect(getTopSubmitters([
+      { submitterName: "Old Name", submitterEmail: " ADA@example.com " },
+      { submitterName: "Ada", submitterEmail: "ada@example.com", submitterUserId: "user1" },
+      { submitterName: "Ada", submitterEmail: "another@example.com", submitterUserId: "user2" },
+    ])).toEqual([{ name: "Old Name", count: 2 }, { name: "Ada", count: 1 }]);
+  });
+
   it("ranks submitters by submission count and limits the result", () => {
     const songs = ["Ada", "Grace", "Ada", "Linus", "Ada", "Grace", "Margaret"].map(
       (submitterName) => ({ submitterName })

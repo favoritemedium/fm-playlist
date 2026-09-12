@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import {
   Heart,
   MessageSquare,
@@ -11,7 +11,7 @@ import {
   Sparkles,
   ChevronDown,
 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import type { Song } from "@/types/song";
 import { getTopSubmitters } from "@/lib/playlist-recap";
@@ -26,19 +26,17 @@ export function PlaylistRecap({
   defaultExpanded?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(defaultExpanded);
+  const contentId = useId();
+  const reducedMotion = useReducedMotion();
   const t = useTranslations("recap");
 
   const recap = useMemo(() => {
-    const contributors = new Set(
-      songs
-        .map((song) => song.submitterName.trim().toLocaleLowerCase("en-US"))
-        .filter(Boolean)
-    );
+    const contributors = getTopSubmitters(songs, songs.length);
     const likes = songs.reduce((total, song) => total + (song.likeCount || 0), 0);
     const comments = songs.reduce((total, song) => total + (song.commentCount || 0), 0);
     const topTrack = [...songs].sort((a, b) => b.likeCount - a.likeCount)[0];
-    const topSubmitters = getTopSubmitters(songs, 3);
-    return { contributors: contributors.size, likes, comments, topTrack, topSubmitters };
+    const topSubmitters = contributors.slice(0, 3);
+    return { contributors: contributors.length, likes, comments, topTrack, topSubmitters };
   }, [songs]);
 
   if (songs.length === 0) return null;
@@ -56,7 +54,7 @@ export function PlaylistRecap({
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
-        aria-controls="playlist-recap-content"
+        aria-controls={isOpen ? contentId : undefined}
         className="group/toggle flex w-full items-center justify-between gap-3 px-3 py-2.5 sm:px-4 sm:py-3 text-left transition-all hover:bg-neutral-50/90 cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/50"
       >
         <div className="flex min-w-0 items-center gap-2 sm:gap-3 flex-wrap">
@@ -127,11 +125,11 @@ export function PlaylistRecap({
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
-            id="playlist-recap-content"
+            id={contentId}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: reducedMotion ? 0 : 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
             <div className="border-t border-border/60 p-3 sm:p-4 pt-3 sm:pt-3.5 space-y-3">
@@ -254,7 +252,7 @@ export function PlaylistRecap({
                           {t("topSubmitters")}
                         </h3>
                       </div>
-                      <ol className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1">
+                      <ol className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 xl:grid-cols-3 gap-2 flex-1">
                         {recap.topSubmitters.map((submitter, index) => {
                           const rankStyles = [
                             "border-amber-400/30 bg-amber-50/60 text-amber-950", // #1 Gold
@@ -270,14 +268,14 @@ export function PlaylistRecap({
 
                           return (
                             <li
-                              key={submitter.name.toLocaleLowerCase("en-US")}
+                              key={index}
                               className={`flex min-w-0 items-center gap-2 rounded-xl border px-2.5 py-2 transition-colors ${rankStyles}`}
                             >
                               <span className={`flex size-5 sm:size-5.5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${badgeStyles}`}>
                                 {index + 1}
                               </span>
                               <div className="min-w-0 flex-1">
-                                <p className="truncate text-xs font-bold leading-tight" title={submitter.name}>
+                                <p className="break-words text-xs font-bold leading-snug" title={submitter.name}>
                                   {submitter.name}
                                 </p>
                                 <p className="text-[10px] font-semibold text-muted-foreground leading-tight mt-0.5">

@@ -43,6 +43,10 @@
     }
   },
   "playlist": {
+    "pagination": {
+      "showing": "{total} න් {count} ක් පෙන්වයි",
+      "loadMore": "තවත් ගීත පෙන්වන්න ({count} ඉතිරිව ඇත)"
+    },
     "allTracks": "සියලුම ගීත",
     "view": {
       "ariaLabel": "ගීත දසුන් පෙරහන",

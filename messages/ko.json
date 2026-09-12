@@ -43,6 +43,10 @@
     }
   },
   "playlist": {
+    "pagination": {
+      "showing": "{total}곡 중 {count}곡 표시",
+      "loadMore": "더 보기 ({count}곡 남음)"
+    },
     "allTracks": "모든 트랙",
     "view": {
       "ariaLabel": "트랙 보기 필터",

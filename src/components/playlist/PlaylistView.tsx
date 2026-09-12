@@ -154,10 +154,10 @@ export function PlaylistView({ initialSongs, user, isForbidden = false }: Playli
     const monthParam = params.get("month");
     const year = Number(yearParam);
     const month = Number(monthParam);
-    if (yearParam === ALL_FILTER_VALUE || Number.isInteger(year)) {
+    if (yearParam === ALL_FILTER_VALUE || (yearParam?.trim() && Number.isInteger(year) && year >= 2000 && year <= 2100)) {
       setSelectedYear(yearParam === ALL_FILTER_VALUE ? ALL_FILTER_VALUE : year);
     }
-    if (monthParam === ALL_FILTER_VALUE || Number.isInteger(month)) {
+    if (monthParam === ALL_FILTER_VALUE || (monthParam?.trim() && Number.isInteger(month) && month >= 1 && month <= 12)) {
       setSelectedMonth(monthParam === ALL_FILTER_VALUE ? ALL_FILTER_VALUE : month);
     }
     const sort = params.get("sort");

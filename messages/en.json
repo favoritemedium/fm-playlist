@@ -43,6 +43,10 @@
     }
   },
   "playlist": {
+    "pagination": {
+      "showing": "Showing {count} of {total}",
+      "loadMore": "Load more tracks ({count} remaining)"
+    },
     "allTracks": "All Tracks",
     "view": {
       "ariaLabel": "Track view filter",

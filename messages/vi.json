@@ -43,6 +43,10 @@
     }
   },
   "playlist": {
+    "pagination": {
+      "showing": "Hiển thị {count} trong {total} bài",
+      "loadMore": "Xem thêm ({count} bài còn lại)"
+    },
     "allTracks": "Tất cả bài hát",
     "view": {
       "ariaLabel": "Bộ lọc chế độ xem bài hát",

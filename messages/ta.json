@@ -43,6 +43,10 @@
     }
   },
   "playlist": {
+    "pagination": {
+      "showing": "{total} பாடல்களில் {count} காட்டப்படுகின்றன",
+      "loadMore": "மேலும் காட்டு ({count} மீதமுள்ளன)"
+    },
     "allTracks": "அனைத்து பாடல்களும்",
     "view": {
       "ariaLabel": "பாடல் காட்சி வடிகட்டி",

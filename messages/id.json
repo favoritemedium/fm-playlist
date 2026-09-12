@@ -43,6 +43,10 @@
     }
   },
   "playlist": {
+    "pagination": {
+      "showing": "Menampilkan {count} dari {total}",
+      "loadMore": "Muat lagu lainnya ({count} tersisa)"
+    },
     "allTracks": "Semua Lagu",
     "view": {
       "ariaLabel": "Filter tampilan lagu",

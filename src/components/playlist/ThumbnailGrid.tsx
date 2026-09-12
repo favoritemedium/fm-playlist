@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { Song } from "@/types/song";
 import { SongCard } from "./SongCard";
 import { Button } from "@/components/ui/button";
@@ -32,10 +32,11 @@ export function ThumbnailGrid({
   const t = useTranslations("playlist");
   const [visibleCount, setVisibleCount] = useState(INITIAL_PAGE_SIZE);
 
-  // Reset pagination when the underlying songs array changes (e.g. filter or search change)
+  // Engagement updates replace song objects without changing the result set.
+  const resultIds = songs.map((song) => song.id).join(",");
   useEffect(() => {
     setVisibleCount(INITIAL_PAGE_SIZE);
-  }, [songs]);
+  }, [resultIds]);
 
   // Ensure currently selected active track is always rendered
   useEffect(() => {
@@ -66,7 +67,7 @@ export function ThumbnailGrid({
         </div>
         {songs.length > INITIAL_PAGE_SIZE && (
           <span className="text-xs font-semibold text-muted-foreground">
-            Showing {visibleSongs.length} of {songs.length}
+            {t("pagination.showing", { count: visibleSongs.length, total: songs.length })}
           </span>
         )}
       </div>
@@ -95,13 +96,9 @@ export function ThumbnailGrid({
             onClick={handleLoadMore}
             className="rounded-xl font-bold bg-white/80 hover:bg-white border-2 border-border/80 hover:border-primary px-6 py-5 shadow-sm hover:shadow-md transition-all gap-2 text-foreground"
           >
-            <span>Load More Tracks ({songs.length - visibleCount} remaining)</span>
+            <span>{t("pagination.loadMore", { count: songs.length - visibleCount })}</span>
             <ChevronDown className="size-4 text-primary" />
           </Button>
-          <p className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
-            <Sparkles className="size-3 text-primary/70" />
-            <span>Optimized for fast and smooth scrolling</span>
-          </p>
         </div>
       )}
     </div>
