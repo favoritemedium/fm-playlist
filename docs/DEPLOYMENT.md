@@ -108,6 +108,35 @@ key, so retries for the same job/window do not send duplicate Space messages.
 
 `ensureSchema()` creates or updates the app tables on first access.
 
+## Offsite Database Backup
+
+The `backup` compose service is an idle container (built from
+`db/backup/Dockerfile`, based on `postgres:16-alpine`) that has
+`db/backup/backup.sh` baked in at `/backup/backup.sh`. Each run dumps the app
+database and loads it into a separate Postgres (for example a dedicated Neon project) as a dated schema
+named `backup_YYYYMMDD_HHMMSS` (UTC). Copies beyond `BACKUP_RETENTION`
+(default 7) are dropped, so a bad delete is not mirrored over every copy.
+
+Setup:
+
+1. Create a Postgres database used only for backups and set
+   `BACKUP_DATABASE_URL` (and optionally `BACKUP_RETENTION`) in `.env` or the
+   Coolify environment.
+2. Schedule a task in the `backup` service, e.g. daily:
+   `0 3 * * *` running `/backup/backup.sh`.
+3. Run it once by hand and check the log ends with `done: backup_...`. The
+   script exits non-zero on failure, so the scheduler reports failed runs.
+
+Restore (into an empty database; `$TARGET_URL` is where to restore to):
+
+```sh
+# Pick a copy: psql "$BACKUP_DATABASE_URL" -c '\dn backup_*'
+SCHEMA=backup_20261002_030000
+pg_dump "$BACKUP_DATABASE_URL" --schema="$SCHEMA" --no-owner --no-privileges \
+  | sed -e "s/\b$SCHEMA\b/public/g" -e '/^CREATE SCHEMA public;$/d' \
+  | psql "$TARGET_URL" -v ON_ERROR_STOP=1
+```
+
 ## Clerk Production Setup
 
 - Add `https://<your-domain>` as an allowed production domain.
@@ -134,7 +163,8 @@ orchestration health checks.
 - Rotate `GOOGLE_CHAT_WEBHOOK_URL` if it is copied into a shared place,
   committed by accident, or posted in chat/tickets.
 - Back up Postgres before destructive maintenance. For compose deployments,
-  data lives in the `postgres_data` volume.
+  data lives in the `postgres_data` volume. Routine offsite copies are
+  described under "Offsite Database Backup".
 - Watch logs for engagement listener errors if SSE updates stop. Clients can
   still use the REST APIs, but realtime updates require the Postgres listener.
 - Run `npm audit --audit-level=high` and your container scanner before

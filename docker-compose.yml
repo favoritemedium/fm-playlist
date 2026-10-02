@@ -41,5 +41,17 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # Idle helper for offsite backups. A scheduled task (e.g. Coolify cron) runs
+  # `/backup/backup.sh` inside this container; see docs/DEPLOYMENT.md.
+  backup:
+    build: ./db/backup
+    env_file: .env
+    environment:
+      DATABASE_URL: "postgres://${POSTGRES_USER:-fmplaylist}:${POSTGRES_PASSWORD:-fmplaylist}@db:5432/${POSTGRES_DB:-fm_playlist}"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres_data:
