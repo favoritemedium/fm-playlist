@@ -29,7 +29,12 @@ See [../.env.example](../.env.example) for the full list.
   `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is inlined into the client bundle at
   build time, so set it as both a build-time and runtime variable.
 - **Postgres:** compose uses `POSTGRES_DB`, `POSTGRES_USER`, and
-  `POSTGRES_PASSWORD` to build `DATABASE_URL`. Managed deployments can set
+  `POSTGRES_PASSWORD` to build `DATABASE_URL`. `POSTGRES_PASSWORD` is required
+  (there is no default); use a long random value such as `openssl rand -hex 24`
+  and avoid URL-special characters. Postgres only reads it when the data volume
+  is first created. To change it on an existing volume, run
+  `ALTER USER <user> PASSWORD '<new>';` in the `db` container and update the
+  env var. Managed deployments can set
   `DATABASE_URL` directly.
 - **Domain allowlist:** `ALLOWED_EMAIL_DOMAIN` defaults to `favoritemedium.com`.
   Keep it aligned with Clerk's own sign-in restrictions.

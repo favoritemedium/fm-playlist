@@ -1,8 +1,12 @@
 #!/bin/sh
 # Copies the app database into a dated schema on an offsite Postgres (Neon).
 #
-# Source:  DATABASE_URL         (set by docker-compose.yml)
+# Source:  libpq env vars PGHOST/PGUSER/PGPASSWORD/PGDATABASE (set by
+#          docker-compose.yml), or DATABASE_URL if you prefer a URL
 # Target:  BACKUP_DATABASE_URL  (set in .env / the Coolify environment)
+#
+# The source credentials are handed to libpq through the environment, not the
+# command line, so they do not show up in the process list.
 # Keeps:   BACKUP_RETENTION     most recent copies (default 7)
 #
 # Each run loads the dump into the target's `public` schema, renames it to
@@ -10,15 +14,29 @@
 # See docs/DEPLOYMENT.md for scheduling and restore instructions.
 set -eu
 
-: "${DATABASE_URL:?DATABASE_URL is not set}"
 : "${BACKUP_DATABASE_URL:?BACKUP_DATABASE_URL is not set}"
+if [ -z "${DATABASE_URL:-}" ] && [ -z "${PGHOST:-}" ]; then
+  echo "Set PGHOST/PGUSER/PGPASSWORD/PGDATABASE or DATABASE_URL for the source" >&2
+  exit 2
+fi
 RETENTION="${BACKUP_RETENTION:-7}"
 case "$RETENTION" in
   ''|*[!0-9]*|0) echo "BACKUP_RETENTION must be a positive integer" >&2; exit 2 ;;
 esac
 
 log() { echo "[backup] $(date -u +%H:%M:%S) $*"; }
-target() { PGOPTIONS="-c client_min_messages=warning" psql "$BACKUP_DATABASE_URL" -X -q -v ON_ERROR_STOP=1 "$@"; }
+# Source: libpq env vars (credentials stay off the command line), or
+# --dbname=$DATABASE_URL when a URL is given.
+src() {
+  cmd="$1"; shift
+  if [ -n "${DATABASE_URL:-}" ]; then "$cmd" --dbname="$DATABASE_URL" "$@"; else "$cmd" "$@"; fi
+}
+# Target: URL only; clear source env so nothing leaks across.
+target() {
+  env -u PGHOST -u PGPORT -u PGUSER -u PGPASSWORD -u PGDATABASE -u PGSERVICE \
+    PGOPTIONS="-c client_min_messages=warning" \
+    psql -X -q -v ON_ERROR_STOP=1 --dbname="$BACKUP_DATABASE_URL" "$@"
+}
 
 SCHEMA="backup_$(date -u +%Y%m%d_%H%M%S)"
 DUMP="$(mktemp)"
@@ -26,10 +44,11 @@ trap 'rm -f "$DUMP"' EXIT
 
 log "dumping source database"
 # pg_dump emits CREATE SCHEMA public; the target's public already exists.
-pg_dump "$DATABASE_URL" --schema=public --no-owner --no-privileges --no-comments \
-  | sed '/^CREATE SCHEMA public;$/d' > "$DUMP"
+# (Not piped, so a pg_dump failure stops the script.)
+src pg_dump --schema=public --no-owner --no-privileges --no-comments -f "$DUMP"
+sed -i '/^CREATE SCHEMA public;$/d' "$DUMP"
 
-SRC_TABLES="$(psql "$DATABASE_URL" -X -At -c \
+SRC_TABLES="$(src psql -X -At -c \
   "SELECT count(*) FROM pg_tables WHERE schemaname = 'public'")"
 [ "$SRC_TABLES" -gt 0 ] || { log "source has no tables, refusing to back up"; exit 1; }
 

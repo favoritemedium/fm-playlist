@@ -10,7 +10,7 @@ services:
     env_file: .env
     environment:
       # Built from POSTGRES_* vars in .env. Single source of truth.
-      DATABASE_URL: "postgres://${POSTGRES_USER:-fmplaylist}:${POSTGRES_PASSWORD:-fmplaylist}@db:5432/${POSTGRES_DB:-fm_playlist}"
+      DATABASE_URL: "postgres://${POSTGRES_USER:-fmplaylist}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-fm_playlist}"
     depends_on:
       db:
         condition: service_healthy
@@ -27,7 +27,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-fm_playlist}
       POSTGRES_USER: ${POSTGRES_USER:-fmplaylist}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fmplaylist}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     # Uncomment to expose Postgres to the host for debugging:
     # ports:
     #   - "5432:5432"
@@ -45,9 +45,15 @@ services:
   # `/backup/backup.sh` inside this container; see docs/DEPLOYMENT.md.
   backup:
     build: ./db/backup
-    env_file: .env
+    # Only what the script needs: no env_file, so Clerk and other app secrets
+    # are not exposed to this container. Credentials go via libpq env vars.
     environment:
-      DATABASE_URL: "postgres://${POSTGRES_USER:-fmplaylist}:${POSTGRES_PASSWORD:-fmplaylist}@db:5432/${POSTGRES_DB:-fm_playlist}"
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-fmplaylist}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      PGDATABASE: ${POSTGRES_DB:-fm_playlist}
+      BACKUP_DATABASE_URL: ${BACKUP_DATABASE_URL:-}
+      BACKUP_RETENTION: ${BACKUP_RETENTION:-7}
     depends_on:
       db:
         condition: service_healthy
