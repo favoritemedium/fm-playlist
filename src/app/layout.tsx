@@ -38,6 +38,9 @@ export default async function RootLayout({
       lang={locale}
       className={`${montserrat.variable} ${nunitoSans.variable}`}
     >
+      <head>
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="AI agent guide" />
+      </head>
       <body>
         <ClerkProvider>
           <NextIntlClientProvider messages={messages}>

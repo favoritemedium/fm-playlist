@@ -123,6 +123,26 @@ BEGIN
   END IF;
 END $$;
 
+ALTER TABLE songs ADD COLUMN IF NOT EXISTS submitted_via TEXT;
+
+CREATE TABLE IF NOT EXISTS agent_tokens (
+  id                   SERIAL PRIMARY KEY,
+  user_id              TEXT        NOT NULL REFERENCES app_users(clerk_user_id) ON DELETE CASCADE,
+  name                 TEXT        NOT NULL CONSTRAINT agent_tokens_name_check CHECK (char_length(btrim(name)) BETWEEN 1 AND 40),
+  token_hash           TEXT        NOT NULL UNIQUE,
+  token_prefix         TEXT        NOT NULL,
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_used_at         TIMESTAMPTZ,
+  revoked_at           TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS agent_tokens_user_idx
+  ON agent_tokens (user_id);
+
+CREATE INDEX IF NOT EXISTS songs_agent_submissions_idx
+  ON songs (submitter_user_id, created_at DESC)
+  WHERE submitted_via IS NOT NULL;
+
 CREATE INDEX IF NOT EXISTS app_users_email_idx
   ON app_users (lower(email));
 

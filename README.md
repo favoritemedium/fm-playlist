@@ -77,7 +77,11 @@ npm run test    # Run unit tests
 
 - `GET /api/health` is public and returns `{"ok": true}` for orchestration.
 - `GET /api/songs` is public for read-only browsing. `POST /api/songs` requires
-  an authenticated Clerk user from the allowed email domain.
+  an authenticated Clerk user from the allowed email domain or a personal agent
+  token. Agent tokens are submission-only and limited to one song per owner per
+  rolling seven days, across all their tokens.
+- `/llms.txt` and `/agent-api.md` are public, website-accessible agent guides.
+  The footer links to the API guide; neither guide requires sign-in or repository access.
 - `GET /api/songs/[songId]/likes` and `GET /api/songs/[songId]/comments` are
   public read endpoints. Mutating likes/comments and `/api/notifications`
   require the same allowed-domain Clerk auth.
@@ -133,6 +137,8 @@ db/
 
 ## Documentation
 
+- [Agent API](docs/AGENT_API.md)
+- [Website agent guide (canonical)](public/agent-api.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Clerk Setup](docs/CLERK_SETUP.md)
 - [Database Schema](docs/DATABASE_SCHEMA.md)

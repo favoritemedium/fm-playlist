@@ -53,7 +53,14 @@ Postgres failures are fatal because Postgres is the sole source of truth.
 
 - `GET /api/health` is public and used only for health checks.
 - `GET /api/songs` returns public read-only playlist data. `POST /api/songs`
-  requires an authenticated user from the allowed domain.
+  requires an authenticated user from the allowed domain or a personal agent
+  token. Agent submissions receive server-derived ownership and `submittedVia`
+  attribution, with a shared one-per-owner rolling seven-day limit.
+- `GET` / `POST /api/agent-tokens` list/create personal tokens and
+  `DELETE /api/agent-tokens/[tokenId]` revokes an owned token. All require a
+  permitted Clerk session; bearer agent tokens cannot manage tokens.
+- `/llms.txt` and `/agent-api.md` serve static, public agent instructions. The
+  canonical guide lives in `public/agent-api.md` and is included in Docker builds.
 - `POST /api/songs` validates the request body, extracts the YouTube video ID,
   and inserts a new app-sourced row.
 - `GET /api/songs/[songId]/likes` returns `{ summary, likers }` publicly.
@@ -77,6 +84,8 @@ API errors use `{ error, code, details? }` JSON bodies.
 ## Shared Utilities
 
 - `src/lib/auth.ts` maps Clerk users and enforces the allowed domain.
+- `src/lib/agent-tokens.ts` generates/hashes tokens, authenticates their owners,
+  and manages the owner-locked active-token quota and revocation.
 - `src/lib/validation.ts` validates song submissions with Zod.
 - `src/lib/youtube.ts` parses supported YouTube URL shapes with `URL` parsing.
 - `src/lib/dates.ts` normalizes date-only values and avoids timezone drift.

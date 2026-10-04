@@ -4,6 +4,7 @@ import {
   SONG_DESCRIPTION_MAX_LENGTH,
 } from "./song-limits";
 import {
+  createAgentTokenInputSchema,
   createSongCommentInputSchema,
   createSongInputSchema,
   dbSongIdSchema,
@@ -107,5 +108,14 @@ describe("comment schemas", () => {
         `Comment must be ${SONG_COMMENT_MAX_LENGTH} characters or fewer`
       );
     }
+  });
+});
+
+describe("createAgentTokenInputSchema", () => {
+  it("trims the agent name and enforces 1-40 characters", () => {
+    expect(createAgentTokenInputSchema.parse({ name: "  Claude Code  " })).toEqual({ name: "Claude Code" });
+    expect(createAgentTokenInputSchema.safeParse({ name: "   " }).success).toBe(false);
+    expect(createAgentTokenInputSchema.safeParse({ name: "x".repeat(41) }).success).toBe(false);
+    expect(createAgentTokenInputSchema.safeParse({ name: "ok", extra: 1 }).success).toBe(false);
   });
 });

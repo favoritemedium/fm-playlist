@@ -45,11 +45,13 @@ Indexes:
 | `submitted_date` | `DATE` | No | Submission date as `YYYY-MM-DD` |
 | `month` | `SMALLINT` | No | 1-12, derived from `submitted_date` |
 | `year` | `INTEGER` | No | Derived from `submitted_date` |
+| `submitted_via` | `TEXT` | Yes | Name of the agent that submitted the song for its owner; `NULL` for songs added in the web app |
 | `created_at` | `TIMESTAMPTZ` | No | Auto-populated |
 | `updated_at` | `TIMESTAMPTZ` | No | Auto-updated by trigger |
 
 Indexes:
 
+- `songs_agent_submissions_idx` on `(submitter_user_id, created_at DESC)` where `submitted_via IS NOT NULL` (weekly agent limit)
 - `songs_submitted_date_idx` on `submitted_date DESC`
 - `songs_year_month_idx` on `(year, month)`
 - `songs_youtube_video_id_idx` on `youtube_video_id`
@@ -63,6 +65,26 @@ Constraints:
 - `year` must be between 2000 and 2100.
 - `submitter_user_id` references `app_users(clerk_user_id)` and is set to
    `NULL` if the user row is deleted.
+
+## `agent_tokens` Table
+
+`agent_tokens` holds the personal API tokens agents use to submit songs. Only a
+SHA-256 hash is stored; see [AGENT_API.md](AGENT_API.md).
+
+| Column | Type | Null | Description |
+|---|---|---|---|
+| `id` | `SERIAL PK` | No | Auto-increment primary key |
+| `user_id` | `TEXT FK` | No | Owner; references `app_users(clerk_user_id)`, deleted with the user |
+| `name` | `TEXT` | No | Agent name shown as "via <name>" (1-40 characters) |
+| `token_hash` | `TEXT UNIQUE` | No | SHA-256 hex of the token |
+| `token_prefix` | `TEXT` | No | First 8 characters, to recognise a token in the list |
+| `created_at` | `TIMESTAMPTZ` | No | Auto-populated |
+| `last_used_at` | `TIMESTAMPTZ` | Yes | Updated at most once a minute |
+| `revoked_at` | `TIMESTAMPTZ` | Yes | Set when the owner revokes the token |
+
+Indexes:
+
+- `agent_tokens_user_idx` on `user_id`
 
 ## `song_likes` Table
 

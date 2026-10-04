@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bookmark, Heart, MessageSquare, Play, Music, Check } from "lucide-react";
+import { Bookmark, Bot, Heart, MessageSquare, Play, Music, Check } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import type { Song } from "@/types/song";
@@ -32,7 +32,7 @@ export function SongCard({
   const t = useTranslations("playlist");
   const [imageError, setImageError] = useState(false);
 
-  const trackLabel = [song.songTitle, song.artistName, t("card.sharedBy", { name: song.submitterName })]
+  const trackLabel = [song.songTitle, song.artistName, t("card.sharedBy", { name: song.submitterName }), song.submittedVia ? t("card.viaAgent", { agent: song.submittedVia }) : null]
     .filter(Boolean)
     .join(" - ");
 
@@ -86,6 +86,14 @@ export function SongCard({
             <span className="inline-flex min-w-9 items-center justify-center gap-1 rounded-full bg-black/75 backdrop-blur-md px-2 py-0.5 text-[10px] font-black text-white shadow-xs">
               <MessageSquare className="size-2.5 text-secondary" />
               {song.commentCount}
+            </span>
+          )}
+          {song.submittedVia && (
+            <span
+              className="inline-flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md p-1 text-white/80 shadow-xs"
+              title={t("card.viaAgent", { agent: song.submittedVia })}
+            >
+              <Bot className="size-2.5" />
             </span>
           )}
           {isPlayed && !isActive && (

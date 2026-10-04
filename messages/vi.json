@@ -21,6 +21,7 @@
   "settings": {
     "ariaLabel": "Cài đặt danh sách nhạc",
     "title": "Cài đặt",
+    "agentAccess": "Agent access",
     "playback": {
       "sectionTitle": "Cài đặt phát nhạc",
       "autoPlay": {
@@ -60,7 +61,8 @@
       "untitled": "Bài hát chưa có tiêu đề",
       "sharedBy": "Được chia sẻ bởi {name}",
       "save": "Lưu bài hát",
-      "removeSaved": "Xóa khỏi bài hát đã lưu"
+      "removeSaved": "Xóa khỏi bài hát đã lưu",
+      "viaAgent": "Shared via {agent}"
     },
     "sort": {
       "ariaLabel": "Sắp xếp bài hát",
@@ -138,6 +140,38 @@
     ,"removeSaved": "Remove from saved"
     ,"share": "Share"
     ,"delete": "Delete"
+    ,"viaAgent": "via {agent}"
+  },
+  "agentAccessDialog": {
+    "title": "Agent access",
+    "description": "Let a personal AI agent (Claude Code, Codex, Gemini and others) submit a song for you. Each agent gets its own token.",
+    "limitNote": "Agents can submit 1 song per week in total, across all of your agents. Songs they add belong to you and show a \"via\" label.",
+    "nameLabel": "Agent name",
+    "namePlaceholder": "e.g. Claude Code",
+    "create": "Create token",
+    "creating": "Creating...",
+    "newTokenTitle": "Copy your new token now",
+    "newTokenNote": "It is shown only once. Treat it like a password and give it only to your agent.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "dismiss": "Done",
+    "yourTokens": "Your tokens",
+    "loading": "Đang tải token...",
+    "retry": "Thử lại",
+    "revoking": "Đang thu hồi...",
+    "revokeNamed": "Thu hồi token của {name}",
+    "noTokens": "No agent tokens yet.",
+    "lastUsed": "Last used {date}",
+    "neverUsed": "Never used",
+    "revoke": "Revoke",
+    "usageTitle": "How agents submit a song",
+    "usageNote": "Send the token as a Bearer header. See /agent-api.md for details.",
+    "errors": {
+      "failedToLoad": "Could not load agent tokens",
+      "failedToCreate": "Could not create the token",
+      "failedToRevoke": "Could not revoke the token",
+      "failedToCopy": "Không thể sao chép token. Hãy chọn và sao chép thủ công."
+    }
   },
   "deleteSongDialog": {
     "title": "Delete this track?",

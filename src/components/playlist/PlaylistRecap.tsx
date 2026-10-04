@@ -136,12 +136,12 @@ export function PlaylistRecap({
               {/* Stats Bar */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
                 {/* Total Tracks */}
-                <div className="flex items-center gap-2 sm:gap-2.5 rounded-xl border border-border/60 bg-neutral-50/70 px-2.5 sm:px-3 py-2 transition-all hover:bg-secondary/5 hover:border-secondary/20">
+                <div className="flex items-center gap-2 max-[359px]:flex-col max-[359px]:items-start max-[359px]:gap-1.5 sm:gap-2.5 rounded-xl border border-border/60 bg-neutral-50/70 px-2.5 sm:px-3 py-2 transition-all hover:bg-secondary/5 hover:border-secondary/20">
                   <span className="flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
                     <Music2 className="size-3.5 sm:size-4" strokeWidth={2.5} />
                   </span>
                   <div className="min-w-0">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-muted-foreground truncate">
+                    <span className="block break-words text-[10px] font-black uppercase leading-tight tracking-normal text-muted-foreground [overflow-wrap:anywhere] sm:tracking-wider">
                       {t("tracks")}
                     </span>
                     <span className="text-base sm:text-lg font-black text-foreground tracking-tight leading-tight block">
@@ -151,12 +151,12 @@ export function PlaylistRecap({
                 </div>
 
                 {/* Community Likes */}
-                <div className="flex items-center gap-2 sm:gap-2.5 rounded-xl border border-border/60 bg-neutral-50/70 px-2.5 sm:px-3 py-2 transition-all hover:bg-primary/5 hover:border-primary/20">
+                <div className="flex items-center gap-2 max-[359px]:flex-col max-[359px]:items-start max-[359px]:gap-1.5 sm:gap-2.5 rounded-xl border border-border/60 bg-neutral-50/70 px-2.5 sm:px-3 py-2 transition-all hover:bg-primary/5 hover:border-primary/20">
                   <span className="flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Heart className="size-3.5 sm:size-4" strokeWidth={2.5} fill="currentColor" />
                   </span>
                   <div className="min-w-0">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-muted-foreground truncate">
+                    <span className="block break-words text-[10px] font-black uppercase leading-tight tracking-normal text-muted-foreground [overflow-wrap:anywhere] sm:tracking-wider">
                       {t("likes")}
                     </span>
                     <span className="text-base sm:text-lg font-black text-foreground tracking-tight leading-tight block">
@@ -166,12 +166,12 @@ export function PlaylistRecap({
                 </div>
 
                 {/* Community Comments */}
-                <div className="flex items-center gap-2 sm:gap-2.5 rounded-xl border border-border/60 bg-neutral-50/70 px-2.5 sm:px-3 py-2 transition-all hover:bg-purple-500/5 hover:border-purple-500/20">
+                <div className="flex items-center gap-2 max-[359px]:flex-col max-[359px]:items-start max-[359px]:gap-1.5 sm:gap-2.5 rounded-xl border border-border/60 bg-neutral-50/70 px-2.5 sm:px-3 py-2 transition-all hover:bg-purple-500/5 hover:border-purple-500/20">
                   <span className="flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600">
                     <MessageSquare className="size-3.5 sm:size-4" strokeWidth={2.5} />
                   </span>
                   <div className="min-w-0">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-muted-foreground truncate">
+                    <span className="block break-words text-[10px] font-black uppercase leading-tight tracking-normal text-muted-foreground [overflow-wrap:anywhere] sm:tracking-wider">
                       {t("comments")}
                     </span>
                     <span className="text-base sm:text-lg font-black text-foreground tracking-tight leading-tight block">
@@ -181,12 +181,12 @@ export function PlaylistRecap({
                 </div>
 
                 {/* Contributors */}
-                <div className="flex items-center gap-2 sm:gap-2.5 rounded-xl border border-border/60 bg-neutral-50/70 px-2.5 sm:px-3 py-2 transition-all hover:bg-amber-500/5 hover:border-amber-500/20">
+                <div className="flex items-center gap-2 max-[359px]:flex-col max-[359px]:items-start max-[359px]:gap-1.5 sm:gap-2.5 rounded-xl border border-border/60 bg-neutral-50/70 px-2.5 sm:px-3 py-2 transition-all hover:bg-amber-500/5 hover:border-amber-500/20">
                   <span className="flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
                     <Users className="size-3.5 sm:size-4" strokeWidth={2.5} />
                   </span>
                   <div className="min-w-0">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-muted-foreground truncate">
+                    <span className="block break-words text-[10px] font-black uppercase leading-tight tracking-normal text-muted-foreground [overflow-wrap:anywhere] sm:tracking-wider">
                       {t("contributors")}
                     </span>
                     <span className="text-base sm:text-lg font-black text-foreground tracking-tight leading-tight block">

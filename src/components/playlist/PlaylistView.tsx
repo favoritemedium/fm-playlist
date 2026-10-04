@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import {
   ArrowDownUp,
@@ -44,6 +44,7 @@ import { ThumbnailGrid } from "./ThumbnailGrid";
 import { AddTrackDialog } from "./AddTrackDialog";
 import { EngagementDialog } from "./EngagementDialog";
 import { DeleteSongDialog } from "./DeleteSongDialog";
+import { AgentAccessDialog } from "./AgentAccessDialog";
 import { useEngagementEvents } from "./useEngagementEvents";
 import {
   usePlaylistFiltering,
@@ -94,6 +95,8 @@ export function PlaylistView({ initialSongs, user, isForbidden = false }: Playli
   const [activeVideo, setActiveVideo] = useState<Song | null>(null);
   const [engagementSongId, setEngagementSongId] = useState<string | null>(null);
   const [songPendingDeletion, setSongPendingDeletion] = useState<Song | null>(null);
+  const [agentAccessOpen, setAgentAccessOpen] = useState(false);
+  const agentAccessReturnFocusRef = useRef<HTMLButtonElement | null>(null);
   const [pendingLikeSongIds, setPendingLikeSongIds] = useState<Set<string>>(
     () => new Set()
   );
@@ -624,6 +627,12 @@ export function PlaylistView({ initialSongs, user, isForbidden = false }: Playli
                 onStartPlayingWhenSelectedChange={handleAutoplayToggle}
                 continuePlayingPlaylist={continuePlaying}
                 onContinuePlayingPlaylistChange={handleContinuePlayingToggle}
+                onOpenAgentAccess={
+                  user && !isForbidden ? (returnFocusTo) => {
+                    agentAccessReturnFocusRef.current = returnFocusTo;
+                    setAgentAccessOpen(true);
+                  } : undefined
+                }
               />
             </div>
           }
@@ -888,6 +897,11 @@ export function PlaylistView({ initialSongs, user, isForbidden = false }: Playli
           trackCount={filteredSongs.length}
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
+        />
+        <AgentAccessDialog
+          open={agentAccessOpen}
+          onOpenChange={setAgentAccessOpen}
+          returnFocusRef={agentAccessReturnFocusRef}
         />
         <DeleteSongDialog
           song={songPendingDeletion}

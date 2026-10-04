@@ -11,6 +11,24 @@ npm run build
 
 `npm run test:watch` starts Vitest in watch mode for local development.
 
+### Isolated agent API database tests
+
+The optional `src/lib/agent-api.integration.test.ts` suite exercises real
+Postgres locks, concurrent token/song limits, revocation, and ownership.
+It skips unless `TEST_DATABASE_URL` is set and refuses anything except the
+dedicated local `review` database on port 55432. It creates a unique schema,
+uses no `public` fallback, and removes only that schema when finished.
+
+With that dedicated test database running:
+
+```bash
+TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55432/review npm test -- src/lib/agent-api.integration.test.ts
+```
+
+Never point verification scripts at production or reuse the application's
+database credentials. Stop task-started databases and browsers after testing,
+preserving existing services and persistent volumes.
+
 ## Current Test Coverage
 
 Unit tests cover:
@@ -19,6 +37,9 @@ Unit tests cover:
 - Date-only normalization and display formatting
 - Song submission validation
 - API auth/error helper behavior
+- Agent token formatting, hashing, ownership, revocation, and active-token limits
+- Agent versus human song submission routes, invalid payloads, duplicate responses,
+  and weekly rate-limit response headers
 - Reminder date-window, message, cron auth, and Google Chat client behavior
 
 Test files live beside the code they cover as `*.test.ts` files.
@@ -48,6 +69,17 @@ After larger changes, verify these flows in a browser:
 12. When one user comments on another user's song, the submitter sees an
   in-app notification and can open the related track from it.
 13. Mobile, tablet, and desktop layouts do not overlap.
+14. Settings → Agent access is available only to eligible signed-in users. Check
+   loading, empty, failure, create/copy, and revoke states at 320px, 390px, 768px,
+   and desktop widths. Never include real plaintext tokens in screenshots.
+15. Closing/reopening Agent access while a request is pending must not restore a
+   plaintext token from a closed dialog. Verify clipboard failure feedback.
+16. The footer's Agent API link, `/agent-api.md`, and `/llms.txt` work signed out.
+17. Escape closes Settings and returns focus to its button. Tab-out and an
+   outside pointer press dismiss it. Closing Agent access also returns focus to
+   the persistent Settings button, even though the menu item has unmounted.
+18. At 320px, recap stat labels remain readable without clipping or splitting
+   the English Contributors label; longer translations may wrap within cards.
 
 ## API Checks
 
@@ -59,6 +91,10 @@ With a running app, verify:
 - `POST /api/songs` rejects malformed JSON, invalid YouTube URLs, and
   forbidden-domain users.
 - Allowed users can submit a valid YouTube URL.
+- A personal agent token can submit on its owner's behalf only at `POST /api/songs`.
+  Verify attribution, duplicate handling, weekly limits across multiple tokens,
+  revoked/unknown token rejection, and rejection by token-management endpoints.
+  Use an isolated database and synthetic credentials for mutating tests.
 - `GET /api/songs/[songId]/likes` returns `{ summary, likers }` for an
   authenticated song.
 - `POST /api/songs/[songId]/likes` likes the song, and

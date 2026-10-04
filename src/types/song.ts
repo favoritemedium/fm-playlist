@@ -17,6 +17,8 @@ export interface Song {
   commentCount: number;
   userLiked: boolean;
   bookmarked?: boolean;
+  /** Name of the agent that submitted this song for its owner, if any. */
+  submittedVia?: string | null;
 }
 
 export interface EngagementUser {

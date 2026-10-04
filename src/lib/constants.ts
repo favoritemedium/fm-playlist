@@ -58,3 +58,8 @@ export function formatPlaylistPeriod(
 
   return formatMonthYear(month, year);
 }
+
+export function isAllowedEmailDomain(email: string): boolean {
+  const domain = email.toLowerCase().split("@").at(-1);
+  return domain === ALLOWED_EMAIL_DOMAIN.toLowerCase();
+}

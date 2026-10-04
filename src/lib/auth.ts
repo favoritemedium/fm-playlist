@@ -1,5 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { ALLOWED_EMAIL_DOMAIN } from "@/lib/constants";
+import { isAllowedEmailDomain } from "@/lib/constants";
 
 export interface AppUser {
   id: string;
@@ -12,11 +12,6 @@ export type AppAuthResult =
   | { status: "authenticated"; user: AppUser }
   | { status: "unauthenticated" }
   | { status: "forbidden"; user?: AppUser; email?: string };
-
-function isAllowedEmail(email: string): boolean {
-  const domain = email.toLowerCase().split("@").at(-1);
-  return domain === ALLOWED_EMAIL_DOMAIN.toLowerCase();
-}
 
 export async function getCurrentAppAuth(): Promise<AppAuthResult> {
   const user = await currentUser();
@@ -40,7 +35,7 @@ export async function getCurrentAppAuth(): Promise<AppAuthResult> {
     picture: user.imageUrl || undefined,
   };
 
-  if (!email || !isAllowedEmail(email)) {
+  if (!email || !isAllowedEmailDomain(email)) {
     return { status: "forbidden", user: appUser, email };
   }
 

@@ -76,3 +76,13 @@ export type ValidatedCreateSongCommentInput = z.infer<
 export type ValidatedUpdateSongCommentInput = z.infer<
   typeof updateSongCommentInputSchema
 >;
+
+export const createAgentTokenInputSchema = z
+  .object({
+    name: z
+      .string({ error: "Agent name must be text" })
+      .trim()
+      .min(1, "Agent name is required")
+      .max(40, "Agent name must be 40 characters or fewer"),
+  })
+  .strict();

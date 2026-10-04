@@ -7,6 +7,7 @@ node_modules
 docs
 guidelines
 *.md
+!public/agent-api.md
 .next
 .vscode
 .idea

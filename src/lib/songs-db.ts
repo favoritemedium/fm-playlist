@@ -24,6 +24,7 @@ export interface SongRow {
   comment_count?: number | string;
   user_liked?: boolean;
   bookmarked?: boolean;
+  submitted_via?: string | null;
 }
 
 export interface SongInsert {
@@ -40,6 +41,7 @@ export interface SongInsert {
   submitted_date: string;
   month: number;
   year: number;
+  submitted_via?: string | null;
 }
 
 function toSongSource(source: string): Song["source"] {
@@ -70,19 +72,20 @@ function rowToSong(row: SongRow): Song {
     commentCount: Number(row.comment_count ?? 0),
     userLiked: Boolean(row.user_liked),
     bookmarked: Boolean(row.bookmarked),
+    submittedVia: row.submitted_via ?? null,
   };
 }
 
 const SELECT_COLS = `
   id, source, airtable_record_id, submitter_user_id, submitter_name, submitter_email,
   artist_name, song_title, description, youtube_url, youtube_video_id,
-  submitted_date, month, year
+  submitted_date, month, year, submitted_via
 `;
 
 const QUALIFIED_SELECT_COLS = `
   s.id, s.source, s.airtable_record_id, s.submitter_user_id, s.submitter_name, s.submitter_email,
   s.artist_name, s.song_title, s.description, s.youtube_url, s.youtube_video_id,
-  s.submitted_date, s.month, s.year
+  s.submitted_date, s.month, s.year, s.submitted_via
 `;
 
 export async function fetchAllSongs(currentUserId: string | null = null): Promise<Song[]> {
@@ -172,32 +175,109 @@ export async function setSongBookmarked(
   return bookmarked;
 }
 
+const INSERT_SONG_SQL = `INSERT INTO songs (
+       source, airtable_record_id, submitter_user_id, submitter_name, submitter_email,
+       artist_name, song_title, description, youtube_url, youtube_video_id,
+       submitted_date, month, year, submitted_via
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+     RETURNING ${SELECT_COLS}`;
+
+function songInsertParams(row: SongInsert): unknown[] {
+  return [
+    row.source,
+    row.airtable_record_id,
+    row.submitter_user_id,
+    row.submitter_name,
+    row.submitter_email,
+    row.artist_name,
+    row.song_title,
+    row.description,
+    row.youtube_url,
+    row.youtube_video_id,
+    row.submitted_date,
+    row.month,
+    row.year,
+    row.submitted_via ?? null,
+  ];
+}
+
 export async function createSongRow(row: SongInsert): Promise<Song> {
   await ensureSchema();
   const result = await getPool().query<SongRow>(
-    `INSERT INTO songs (
-       source, airtable_record_id, submitter_user_id, submitter_name, submitter_email,
-       artist_name, song_title, description, youtube_url, youtube_video_id,
-       submitted_date, month, year
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
-     RETURNING ${SELECT_COLS}`,
-    [
-      row.source,
-      row.airtable_record_id,
-      row.submitter_user_id,
-      row.submitter_name,
-      row.submitter_email,
-      row.artist_name,
-      row.song_title,
-      row.description,
-      row.youtube_url,
-      row.youtube_video_id,
-      row.submitted_date,
-      row.month,
-      row.year,
-    ]
+    INSERT_SONG_SQL,
+    songInsertParams(row)
   );
   return rowToSong(result.rows[0]);
+}
+
+/** Agents may submit one song per person per rolling week. */
+export const AGENT_SONG_LIMIT_DAYS = 7;
+
+export class AgentRateLimitError extends Error {
+  constructor(
+    readonly retryAfterSeconds: number,
+    readonly availableAt: Date
+  ) {
+    super(
+      `Agents can submit one song per ${AGENT_SONG_LIMIT_DAYS} days for each person`
+    );
+    this.name = "AgentRateLimitError";
+  }
+}
+
+/**
+ * Inserts a song submitted by an agent, enforcing the weekly limit across all
+ * of the owner's agents. The per-user advisory lock makes concurrent
+ * submissions queue up so the check cannot be raced.
+ */
+export async function createAgentSongRow(row: SongInsert): Promise<Song> {
+  if (!row.submitter_user_id || !row.submitted_via) {
+    throw new Error("Agent submissions need an owner and an agent name");
+  }
+  await ensureSchema();
+
+  const client = await getPool().connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
+      `agent_song:${row.submitter_user_id}`,
+    ]);
+
+    const recent = await client.query<{ retry_after: number | string }>(
+      `SELECT ceil(extract(epoch FROM (
+                created_at + make_interval(days => $2) - statement_timestamp()
+              )))::int AS retry_after
+       FROM songs
+       WHERE submitter_user_id = $1
+         AND submitted_via IS NOT NULL
+         AND created_at > statement_timestamp() - make_interval(days => $2)
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [row.submitter_user_id, AGENT_SONG_LIMIT_DAYS]
+    );
+    if (recent.rows[0]) {
+      const retryAfter = Math.max(1, Number(recent.rows[0].retry_after));
+      await client.query("ROLLBACK");
+      throw new AgentRateLimitError(
+        retryAfter,
+        new Date(Date.now() + retryAfter * 1000)
+      );
+    }
+
+    const result = await client.query<SongRow>(
+      INSERT_SONG_SQL,
+      songInsertParams(row)
+    );
+    await client.query("COMMIT");
+    return rowToSong(result.rows[0]);
+  } catch (error) {
+    if (!(error instanceof AgentRateLimitError)) {
+      await client.query("ROLLBACK").catch(() => undefined);
+    }
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 /**

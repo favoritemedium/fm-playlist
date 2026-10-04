@@ -5,6 +5,7 @@ import type { AppUser } from "@/lib/auth";
 import {
   fetchAllSongs,
   createSongRow,
+  createAgentSongRow,
   fetchSongByYouTubeVideoId,
 } from "./songs-db";
 import { getDateParts, toDateOnlyString } from "./dates";
@@ -31,7 +32,8 @@ export async function getAllSongs(user?: AppUser): Promise<Song[]> {
 
 export async function createSong(
   input: CreateSongInput,
-  user: AppUser
+  user: AppUser,
+  options: { via?: string } = {}
 ): Promise<Song> {
   await syncAppUserIdentity(user);
 
@@ -65,7 +67,7 @@ export async function createSong(
   const submittedDate = toDateOnlyString(now);
   const { month, year } = getDateParts(submittedDate);
 
-  return createSongRow({
+  const insert = {
     source: "app",
     airtable_record_id: null,
     submitter_user_id: user.id,
@@ -79,7 +81,10 @@ export async function createSong(
     submitted_date: submittedDate,
     month,
     year,
-  });
+    submitted_via: options.via ?? null,
+  };
+
+  return options.via ? createAgentSongRow(insert) : createSongRow(insert);
 }
 
 export class DuplicateSongError extends Error {

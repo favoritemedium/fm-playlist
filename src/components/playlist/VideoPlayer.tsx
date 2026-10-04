@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
-import { Bookmark, Heart, MessageSquare, Share2, Trash2 } from "lucide-react";
+import { Bookmark, Heart, MessageSquare, Bot, Share2, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Song } from "@/types/song";
 import { formatDateOnlyForDisplay } from "@/lib/dates";
@@ -113,16 +113,22 @@ export function VideoPlayer({
       </div>
       <div className="space-y-3 p-4 sm:p-6 max-lg:mt-3 max-lg:rounded-2xl max-lg:border-2 max-lg:border-primary/20 max-lg:bg-white max-lg:shadow-md lg:mt-0 lg:flex lg:flex-col lg:justify-center">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <p className="font-bold text-foreground">{song.submitterName}</p>
+          <p className="min-w-0 max-w-full break-words font-bold text-foreground">{song.submitterName}</p>
+          {song.submittedVia && (
+            <span className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full bg-secondary/10 px-2 py-0.5 text-xs font-bold text-secondary">
+              <Bot className="size-3 shrink-0" aria-hidden="true" />
+              <span className="min-w-0 break-words">{t("viaAgent", { agent: song.submittedVia })}</span>
+            </span>
+          )}
           {song.songTitle && (
-            <p className="text-sm text-muted-foreground">
+            <p className="min-w-0 max-w-full break-words text-sm text-muted-foreground">
               — {song.songTitle}
               {song.artistName && ` ${t("byArtist", { artist: song.artistName })}`}
             </p>
           )}
         </div>
         {song.description && (
-          <p className="text-lg text-foreground leading-relaxed font-medium">
+          <p className="break-words text-lg text-foreground leading-relaxed font-medium">
             &ldquo;{song.description}&rdquo;
           </p>
         )}

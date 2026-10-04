@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Settings } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Bot, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 
@@ -10,6 +10,8 @@ interface PlaylistSettingsProps {
   onStartPlayingWhenSelectedChange: () => void;
   continuePlayingPlaylist: boolean;
   onContinuePlayingPlaylistChange: () => void;
+  /** Shown only for signed-in users. */
+  onOpenAgentAccess?: (returnFocusTo: HTMLButtonElement | null) => void;
 }
 
 function SettingToggle({
@@ -72,16 +74,19 @@ export function PlaylistSettings({
   onStartPlayingWhenSelectedChange,
   continuePlayingPlaylist,
   onContinuePlayingPlaylistChange,
+  onOpenAgentAccess,
 }: PlaylistSettingsProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelId = useId();
   const t = useTranslations("settings");
   const tCommon = useTranslations("common");
 
   useEffect(() => {
     if (!open) return;
 
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: PointerEvent) {
       if (
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
@@ -90,16 +95,33 @@ export function PlaylistSettings({
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("pointerdown", handleClickOutside);
+    return () => document.removeEventListener("pointerdown", handleClickOutside);
   }, [open]);
 
   return (
-    <div ref={containerRef}>
+    <div
+      ref={containerRef}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && open) {
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen(false);
+          triggerRef.current?.focus();
+        }
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setOpen(false);
+        }
+      }}
+    >
       <button
+        ref={triggerRef}
         type="button"
         aria-label={t("ariaLabel")}
         aria-expanded={open}
+        aria-controls={open ? panelId : undefined}
         title={t("title")}
         onClick={() => setOpen((v) => !v)}
         className={`rounded-xl p-2 transition-all hover:bg-muted ${
@@ -110,13 +132,13 @@ export function PlaylistSettings({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 w-72 rounded-xl border border-border bg-white p-4 shadow-xl">
+        <div id={panelId} className="absolute right-0 top-full mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-white p-4 shadow-xl">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
             {t("playback.sectionTitle")}
           </p>
           <div className="space-y-5">
             <SettingToggle
-              labelId="setting-start-playing"
+              labelId={`${panelId}-start-playing`}
               label={t("playback.autoPlay.label")}
               description={t("playback.autoPlay.description")}
               checked={startPlayingWhenSelected}
@@ -124,7 +146,7 @@ export function PlaylistSettings({
               comingSoonLabel={tCommon("comingSoon")}
             />
             <SettingToggle
-              labelId="setting-continue-playing"
+              labelId={`${panelId}-continue-playing`}
               label={t("playback.continuePlaying.label")}
               description={t("playback.continuePlaying.description")}
               checked={continuePlayingPlaylist}
@@ -132,6 +154,19 @@ export function PlaylistSettings({
               comingSoonLabel={tCommon("comingSoon")}
             />
           </div>
+          {onOpenAgentAccess && (
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onOpenAgentAccess(triggerRef.current);
+              }}
+              className="mt-5 flex w-full items-center gap-2 border-t border-border pt-4 text-left text-sm font-bold text-foreground transition-colors hover:text-primary"
+            >
+              <Bot className="size-4" />
+              {t("agentAccess")}
+            </button>
+          )}
         </div>
       )}
     </div>

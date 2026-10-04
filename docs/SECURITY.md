@@ -9,6 +9,13 @@ Clerk handles authentication. The app enforces authorization in server code:
 - `src/app/page.tsx` serves read-only playlist content to unauthenticated users
   and identifies forbidden-domain users.
 - `src/app/api/songs/route.ts` leaves `GET` public and protects `POST`.
+- `POST /api/songs` also accepts a personal agent bearer token, resolved by hash
+  to its owner in `app_users`. Ownership and the displayed agent name come from
+  the token, never from the submitted JSON. An invalid bearer header fails closed
+  rather than falling back to a browser session.
+- Agent token management requires an allowed-domain Clerk session. Tokens are
+  submission-only: they cannot mint/revoke other tokens, delete songs, or mutate
+  likes, comments, bookmarks, or notifications.
 - Read-only `GET` likes/comments routes are public. Like/comment mutations,
   bookmarks, notifications, and the engagement event stream use the same
   server-side auth gate.
@@ -24,6 +31,7 @@ Required secrets and private values:
 - `POSTGRES_PASSWORD` or `DATABASE_URL`
 - `GOOGLE_CHAT_WEBHOOK_URL`, when Google Chat reminders are enabled
 - `REMINDER_CRON_SECRET`, when scheduled reminder endpoints are enabled
+- Personal `fmp_` agent tokens; plaintext is shown once and never stored in the DB
 
 Local `.env` files are ignored by Git and Docker build context rules. Leave
 `.env.example` as placeholders only.
@@ -35,6 +43,18 @@ secrets; do not hardcode Clerk keys in workflow YAML.
 Rotate provider tokens when they are committed, copied into a shared channel,
 attached to a ticket, or discovered in a build artifact. Rotation happens in
 Clerk and the deployment host, not in code.
+
+Revoke exposed personal agent tokens in **Settings → Agent access**. Their
+SHA-256 hashes and short display prefixes are stored in `agent_tokens`; plaintext
+must not appear in logs, screenshots, URLs, or checked-in fixtures. The ten-token
+cap is enforced in a transaction locked per owner. Agent song submissions use a
+separate per-owner lock to enforce the shared rolling seven-day limit.
+
+Agent eligibility is checked against the locally stored owner's email. Changes
+to a Clerk account are reflected when its identity is synchronized by the app;
+there is no Clerk account-deletion webhook or automatic token expiration here.
+Revoke tokens explicitly when access is removed. As with any bearer credential,
+revoking a token does not undo requests already authorized or songs already added.
 
 Google Chat webhook URLs are bearer credentials. Do not paste production
 webhook URLs into source files, tickets, logs, or shared chat messages. If a

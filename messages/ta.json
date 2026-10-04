@@ -21,6 +21,7 @@
   "settings": {
     "ariaLabel": "பட்டியல் அமைப்புகள்",
     "title": "அமைப்புகள்",
+    "agentAccess": "Agent access",
     "playback": {
       "sectionTitle": "இயக்க அமைப்புகள்",
       "autoPlay": {
@@ -60,7 +61,8 @@
       "untitled": "தலைப்பில்லாத பாடல்",
       "sharedBy": "{name} பகிர்ந்தது",
       "save": "பாடலை சேமி",
-      "removeSaved": "சேமித்த பாடல்களில் இருந்து நீக்கு"
+      "removeSaved": "சேமித்த பாடல்களில் இருந்து நீக்கு",
+      "viaAgent": "Shared via {agent}"
     },
     "sort": {
       "ariaLabel": "பாடல்களை வரிசைப்படுத்து",
@@ -138,6 +140,38 @@
     ,"removeSaved": "Remove from saved"
     ,"share": "Share"
     ,"delete": "Delete"
+    ,"viaAgent": "via {agent}"
+  },
+  "agentAccessDialog": {
+    "title": "Agent access",
+    "description": "Let a personal AI agent (Claude Code, Codex, Gemini and others) submit a song for you. Each agent gets its own token.",
+    "limitNote": "Agents can submit 1 song per week in total, across all of your agents. Songs they add belong to you and show a \"via\" label.",
+    "nameLabel": "Agent name",
+    "namePlaceholder": "e.g. Claude Code",
+    "create": "Create token",
+    "creating": "Creating...",
+    "newTokenTitle": "Copy your new token now",
+    "newTokenNote": "It is shown only once. Treat it like a password and give it only to your agent.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "dismiss": "Done",
+    "yourTokens": "Your tokens",
+    "loading": "டோக்கன்கள் ஏற்றப்படுகின்றன...",
+    "retry": "மீண்டும் முயற்சிக்கவும்",
+    "revoking": "ரத்து செய்யப்படுகிறது...",
+    "revokeNamed": "{name}க்கான டோக்கனை ரத்து செய்",
+    "noTokens": "No agent tokens yet.",
+    "lastUsed": "Last used {date}",
+    "neverUsed": "Never used",
+    "revoke": "Revoke",
+    "usageTitle": "How agents submit a song",
+    "usageNote": "Send the token as a Bearer header. See /agent-api.md for details.",
+    "errors": {
+      "failedToLoad": "Could not load agent tokens",
+      "failedToCreate": "Could not create the token",
+      "failedToRevoke": "Could not revoke the token",
+      "failedToCopy": "டோக்கனை நகலெடுக்க முடியவில்லை. அதைத் தேர்ந்தெடுத்து நீங்களே நகலெடுக்கவும்."
+    }
   },
   "deleteSongDialog": {
     "title": "Delete this track?",

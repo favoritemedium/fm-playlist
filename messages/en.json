@@ -21,6 +21,7 @@
   "settings": {
     "ariaLabel": "Playlist settings",
     "title": "Settings",
+    "agentAccess": "Agent access",
     "playback": {
       "sectionTitle": "Playback Settings",
       "autoPlay": {
@@ -60,7 +61,8 @@
       "untitled": "Untitled track",
       "sharedBy": "Shared by {name}",
       "save": "Save track",
-      "removeSaved": "Remove from saved tracks"
+      "removeSaved": "Remove from saved tracks",
+      "viaAgent": "Shared via {agent}"
     },
     "sort": {
       "ariaLabel": "Sort tracks",
@@ -137,7 +139,39 @@
     "saved": "Saved",
     "removeSaved": "Remove from saved",
     "share": "Share",
-    "delete": "Delete"
+    "delete": "Delete",
+    "viaAgent": "via {agent}"
+  },
+  "agentAccessDialog": {
+    "title": "Agent access",
+    "description": "Let a personal AI agent (Claude Code, Codex, Gemini and others) submit a song for you. Each agent gets its own token.",
+    "limitNote": "Agents can submit 1 song per week in total, across all of your agents. Songs they add belong to you and show a \"via\" label.",
+    "nameLabel": "Agent name",
+    "namePlaceholder": "e.g. Claude Code",
+    "create": "Create token",
+    "creating": "Creating...",
+    "newTokenTitle": "Copy your new token now",
+    "newTokenNote": "It is shown only once. Treat it like a password and give it only to your agent.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "dismiss": "Done",
+    "yourTokens": "Your tokens",
+    "loading": "Loading tokens...",
+    "retry": "Try again",
+    "revoking": "Revoking...",
+    "revokeNamed": "Revoke token for {name}",
+    "noTokens": "No agent tokens yet.",
+    "lastUsed": "Last used {date}",
+    "neverUsed": "Never used",
+    "revoke": "Revoke",
+    "usageTitle": "How agents submit a song",
+    "usageNote": "Send the token as a Bearer header. See /agent-api.md for details.",
+    "errors": {
+      "failedToLoad": "Could not load agent tokens",
+      "failedToCreate": "Could not create the token",
+      "failedToRevoke": "Could not revoke the token",
+      "failedToCopy": "Could not copy the token. Select and copy it manually."
+    }
   },
   "deleteSongDialog": {
     "title": "Delete this track?",

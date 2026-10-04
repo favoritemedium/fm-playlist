@@ -46,6 +46,12 @@ export function Footer({ trackCount, selectedMonth, selectedYear }: FooterProps)
         {trackCount} {t("track", { count: trackCount })}
         {periodLabel ? <> {t("inPeriod", { period: periodLabel })}</> : <> {t("total")}</>}
       </p>
+      <a
+        href="/agent-api.md"
+        className="mt-3 inline-block rounded text-sm text-muted-foreground underline underline-offset-4 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        Agent API
+      </a>
     </motion.footer>
   );
 }
