@@ -2,10 +2,11 @@
 
 ## App Will Not Start
 
-**`DATABASE_URL is not set`**
+**`No database configured`**
 
-The app requires Postgres. Compose derives `DATABASE_URL` automatically from
-`POSTGRES_*` values. Local Node and managed deployments must set it explicitly.
+The app requires Postgres. Compose passes `PGHOST`/`PGUSER`/`PGPASSWORD`/
+`PGDATABASE` automatically from `POSTGRES_*` values. Local Node and managed
+deployments must set `DATABASE_URL` (or the `PG*` variables) explicitly.
 
 **Clerk publishable key error**
 

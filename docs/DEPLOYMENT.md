@@ -29,13 +29,14 @@ See [../.env.example](../.env.example) for the full list.
   `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is inlined into the client bundle at
   build time, so set it as both a build-time and runtime variable.
 - **Postgres:** compose uses `POSTGRES_DB`, `POSTGRES_USER`, and
-  `POSTGRES_PASSWORD` to build `DATABASE_URL`. `POSTGRES_PASSWORD` is required
-  (there is no default); use a long random value such as `openssl rand -hex 24`
-  and avoid URL-special characters. Postgres only reads it when the data volume
-  is first created. To change it on an existing volume, run
+  `POSTGRES_PASSWORD` to give the app the standard `PGHOST`/`PGUSER`/
+  `PGPASSWORD`/`PGDATABASE` settings (any `DATABASE_URL` set by the host is
+  ignored). `POSTGRES_PASSWORD` is required (there is no default); use a long
+  random value such as `openssl rand -hex 24`. Postgres only reads it when the
+  data volume is first created. To change it on an existing volume, run
   `ALTER USER <user> PASSWORD '<new>';` in the `db` container and update the
-  env var. Managed deployments can set
-  `DATABASE_URL` directly.
+  env var. Managed deployments without compose can set `DATABASE_URL`
+  directly.
 - **Domain allowlist:** `ALLOWED_EMAIL_DOMAIN` defaults to `favoritemedium.com`.
   Keep it aligned with Clerk's own sign-in restrictions.
 - **Google Chat reminders:** `SERVICE_URL_APP`, `GOOGLE_CHAT_WEBHOOK_URL`, and
@@ -129,6 +130,8 @@ Setup:
    Coolify environment.
 2. Schedule a task in the `backup` service, e.g. daily:
    `0 3 * * *` running `/backup/backup.sh`.
+   The script connects with the `PG*` variables set in `docker-compose.yml`
+   and ignores any `DATABASE_URL` the host injects into the container.
 3. Run it once by hand and check the log ends with `done: backup_...`. The
    script exits non-zero on failure, so the scheduler reports failed runs.
 
@@ -177,8 +180,8 @@ orchestration health checks.
 
 ## Troubleshooting
 
-- **`DATABASE_URL is not set`** - the app requires Postgres. Compose wires it
-  automatically; managed hosts must set it explicitly.
+- **`No database configured`** - the app requires Postgres. Compose wires it
+  automatically; managed hosts must set `DATABASE_URL` (or `PG*`) explicitly.
 - **App starts before DB is ready** - compose waits for Postgres health, but
   outside compose the first request can fail until Postgres accepts connections.
 - **Clerk keys missing or mixed** - use publishable and secret keys from the

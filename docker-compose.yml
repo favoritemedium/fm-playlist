@@ -9,8 +9,12 @@ services:
       - "3000:3000"
     env_file: .env
     environment:
-      # Built from POSTGRES_* vars in .env. Single source of truth.
-      DATABASE_URL: "postgres://${POSTGRES_USER:-fmplaylist}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-fm_playlist}"
+      # Standard libpq settings from the POSTGRES_* vars in .env (single source
+      # of truth). They take precedence over any DATABASE_URL the host injects.
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-fmplaylist}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      PGDATABASE: ${POSTGRES_DB:-fm_playlist}
     depends_on:
       db:
         condition: service_healthy

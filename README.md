@@ -51,8 +51,8 @@ See [.env.example](.env.example) for the full list.
 |---|---|---|
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | ✔ | Clerk publishable key |
 | `CLERK_SECRET_KEY` | ✔ | Clerk secret key |
-| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | ✔ (compose) | Postgres credentials. `DATABASE_URL` is derived in `docker-compose.yml` |
-| `DATABASE_URL` | ✔ (non-compose) | Full Postgres connection string |
+| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | ✔ (compose) | Postgres credentials; `docker-compose.yml` passes them to the app as `PG*` settings |
+| `DATABASE_URL` | ✔ (non-compose) | Full Postgres connection string; ignored when `PGHOST` is set |
 | `ALLOWED_EMAIL_DOMAIN` | — | Server-side fallback allowlist. Defaults to `favoritemedium.com` |
 | `SERVICE_URL_APP` | reminders | Public app URL included in Google Chat messages |
 | `GOOGLE_CHAT_WEBHOOK_URL` | reminders | Google Chat Space webhook URL |

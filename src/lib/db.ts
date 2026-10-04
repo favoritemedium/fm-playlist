@@ -1,8 +1,6 @@
 import "server-only";
 
-import { Pool } from "pg";
-
-const DATABASE_URL = process.env.DATABASE_URL;
+import { Pool, type PoolConfig } from "pg";
 
 // Reuse the pool across Next.js dev HMR reloads.
 const globalForPg = globalThis as unknown as {
@@ -10,13 +8,29 @@ const globalForPg = globalThis as unknown as {
   __pgSchemaReady?: Promise<void>;
 };
 
-function createPool(): Pool {
-  if (!DATABASE_URL) {
-    throw new Error(
-      "DATABASE_URL is not set. The app requires a Postgres connection string."
-    );
+/**
+ * Connection settings. The standard libpq variables (PGHOST, PGUSER,
+ * PGPASSWORD, PGDATABASE, PGPORT) win when PGHOST is set; docker-compose.yml
+ * uses them. Otherwise DATABASE_URL is used. The order matters because hosts
+ * such as Coolify keep their own DATABASE_URL variable, which can be stale.
+ */
+export function resolvePoolConfig(
+  env: Record<string, string | undefined> = process.env
+): PoolConfig {
+  if (env.PGHOST) {
+    // node-postgres reads the PG* variables itself when none are passed.
+    return { max: 10 };
   }
-  return new Pool({ connectionString: DATABASE_URL, max: 10 });
+  if (env.DATABASE_URL) {
+    return { connectionString: env.DATABASE_URL, max: 10 };
+  }
+  throw new Error(
+    "No database configured. Set PGHOST/PGUSER/PGPASSWORD/PGDATABASE or DATABASE_URL."
+  );
+}
+
+function createPool(): Pool {
+  return new Pool(resolvePoolConfig());
 }
 
 export function getPool(): Pool {

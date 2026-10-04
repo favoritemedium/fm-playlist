@@ -2,7 +2,9 @@
 # Copies the app database into a dated schema on an offsite Postgres (Neon).
 #
 # Source:  libpq env vars PGHOST/PGUSER/PGPASSWORD/PGDATABASE (set by
-#          docker-compose.yml), or DATABASE_URL if you prefer a URL
+#          docker-compose.yml). DATABASE_URL is used only when PGHOST is not
+#          set: hosts such as Coolify inject their own (possibly stale)
+#          DATABASE_URL into every service, and it must not win.
 # Target:  BACKUP_DATABASE_URL  (set in .env / the Coolify environment)
 #
 # The source credentials are handed to libpq through the environment, not the
@@ -25,11 +27,15 @@ case "$RETENTION" in
 esac
 
 log() { echo "[backup] $(date -u +%H:%M:%S) $*"; }
-# Source: libpq env vars (credentials stay off the command line), or
-# --dbname=$DATABASE_URL when a URL is given.
+# Source: libpq env vars (credentials stay off the command line). Only without
+# PGHOST do we fall back to --dbname=$DATABASE_URL.
 src() {
   cmd="$1"; shift
-  if [ -n "${DATABASE_URL:-}" ]; then "$cmd" --dbname="$DATABASE_URL" "$@"; else "$cmd" "$@"; fi
+  if [ -z "${PGHOST:-}" ] && [ -n "${DATABASE_URL:-}" ]; then
+    "$cmd" --dbname="$DATABASE_URL" "$@"
+  else
+    "$cmd" "$@"
+  fi
 }
 # Target: URL only; clear source env so nothing leaks across.
 target() {
