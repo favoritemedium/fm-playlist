@@ -68,11 +68,24 @@ export function VideoPlayer({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="overflow-hidden rounded-2xl border-2 border-primary/20 bg-white shadow-xl lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(18rem,2fr)]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
+      // Below lg the wrapper is `display: contents` so the video can stick to
+      // the top of the page on its own while the details card scrolls away.
+      className="overflow-hidden rounded-2xl border-2 border-primary/20 bg-white shadow-xl max-lg:contents lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(18rem,2fr)]"
     >
-      <div className="relative aspect-video bg-black lg:aspect-auto lg:min-h-[22rem]">
+      <div
+        className={
+          "relative aspect-video bg-black lg:aspect-auto lg:min-h-[22rem] " +
+          // Mobile/tablet: keep the player pinned and full-bleed while scrolling.
+          // Height is 16:9 but capped at 40vh so the list stays usable (the
+          // YouTube player letterboxes). Not sticky on short (landscape phone)
+          // viewports, where the player would fill the screen.
+          "max-lg:sticky max-lg:top-0 max-lg:z-40 max-lg:-mx-4 max-lg:aspect-auto max-lg:h-[min(56.25vw,40vh)] max-lg:shadow-lg sm:max-lg:-mx-6 " +
+          "max-lg:[@media(max-height:500px)]:relative max-lg:[@media(max-height:500px)]:h-[56.25vw]"
+        }
+      >
         <iframe
           ref={iframeRef}
           key={song.id}
@@ -95,7 +108,7 @@ export function VideoPlayer({
           }}
         />
       </div>
-      <div className="space-y-3 p-4 sm:p-6 lg:flex lg:flex-col lg:justify-center">
+      <div className="space-y-3 p-4 sm:p-6 max-lg:mt-3 max-lg:rounded-2xl max-lg:border-2 max-lg:border-primary/20 max-lg:bg-white max-lg:shadow-md lg:mt-0 lg:flex lg:flex-col lg:justify-center">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           <p className="font-bold text-foreground">{song.submitterName}</p>
           {song.songTitle && (
