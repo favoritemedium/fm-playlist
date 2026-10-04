@@ -3,6 +3,7 @@ import "server-only";
 import type { Song } from "@/types/song";
 import { toDateOnlyString } from "./dates";
 import { ensureSchema, getPool } from "./db";
+import { EngagementError } from "./engagement-db";
 
 export interface SongRow {
   id: number;
@@ -197,4 +198,38 @@ export async function createSongRow(row: SongInsert): Promise<Song> {
     ]
   );
   return rowToSong(result.rows[0]);
+}
+
+/**
+ * Deletes a song the given user submitted. Likes, comments, bookmarks and
+ * notifications go with it (ON DELETE CASCADE). Songs without a linked
+ * submitter (legacy imports) cannot be deleted this way.
+ */
+export async function deleteOwnSong(
+  songId: number,
+  userId: string
+): Promise<void> {
+  await ensureSchema();
+  const pool = getPool();
+
+  const existing = await pool.query<{ submitter_user_id: string | null }>(
+    "SELECT submitter_user_id FROM songs WHERE id = $1",
+    [songId]
+  );
+  if (!existing.rows[0]) {
+    throw new EngagementError("Song not found", "SONG_NOT_FOUND", 404);
+  }
+  if (existing.rows[0].submitter_user_id !== userId) {
+    throw new EngagementError(
+      "You can only delete songs you shared",
+      "SONG_FORBIDDEN",
+      403
+    );
+  }
+
+  // Re-check ownership in the DELETE so a concurrent change cannot widen it.
+  await pool.query(
+    "DELETE FROM songs WHERE id = $1 AND submitter_user_id = $2",
+    [songId, userId]
+  );
 }

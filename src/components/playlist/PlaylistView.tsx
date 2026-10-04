@@ -43,6 +43,7 @@ import { VideoPlayer } from "./VideoPlayer";
 import { ThumbnailGrid } from "./ThumbnailGrid";
 import { AddTrackDialog } from "./AddTrackDialog";
 import { EngagementDialog } from "./EngagementDialog";
+import { DeleteSongDialog } from "./DeleteSongDialog";
 import { useEngagementEvents } from "./useEngagementEvents";
 import {
   usePlaylistFiltering,
@@ -92,6 +93,7 @@ export function PlaylistView({ initialSongs, user, isForbidden = false }: Playli
   const [playedSongIds, setPlayedSongIds] = useState<Set<string>>(() => new Set());
   const [activeVideo, setActiveVideo] = useState<Song | null>(null);
   const [engagementSongId, setEngagementSongId] = useState<string | null>(null);
+  const [songPendingDeletion, setSongPendingDeletion] = useState<Song | null>(null);
   const [pendingLikeSongIds, setPendingLikeSongIds] = useState<Set<string>>(
     () => new Set()
   );
@@ -536,6 +538,29 @@ export function PlaylistView({ initialSongs, user, isForbidden = false }: Playli
     setShouldAutoplayActiveVideo(false);
   }, []);
 
+  const handleDeleteSong = useCallback(
+    async (song: Song) => {
+      let message = t("errors.failedToDelete");
+      try {
+        const response = await fetch(`/api/songs/${song.id}`, { method: "DELETE" });
+        if (!response.ok) {
+          const data = (await response.json().catch(() => null)) as { error?: string } | null;
+          if (data?.error) message = data.error;
+          throw new Error(message);
+        }
+      } catch (error) {
+        throw error instanceof Error ? error : new Error(message);
+      }
+
+      setSongs((current) => current.filter((item) => item.id !== song.id));
+      setActiveVideo((current) => (current?.id === song.id ? null : current));
+      setEngagementSongId((current) => (current === song.id ? null : current));
+      setShareNotice(t("songDeleted"));
+      window.setTimeout(() => setShareNotice(null), 2500);
+    },
+    [t]
+  );
+
   const handleOpenEngagement = useCallback((song: Song) => {
     setEngagementSongId(song.id);
   }, []);
@@ -829,6 +854,13 @@ export function PlaylistView({ initialSongs, user, isForbidden = false }: Playli
                 isBookmarkPending={pendingBookmarkSongIds.has(currentActive.id)}
                 onBookmarkToggle={handleBookmarkToggle}
                 onShare={handleShare}
+                onDelete={
+                  user?.id &&
+                  !isForbidden &&
+                  currentActive.submitterUserId === user.id
+                    ? setSongPendingDeletion
+                    : undefined
+                }
               />
             )}
             <ActivityPanel
@@ -856,6 +888,13 @@ export function PlaylistView({ initialSongs, user, isForbidden = false }: Playli
           trackCount={filteredSongs.length}
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
+        />
+        <DeleteSongDialog
+          song={songPendingDeletion}
+          onOpenChange={(open) => {
+            if (!open) setSongPendingDeletion(null);
+          }}
+          onConfirm={handleDeleteSong}
         />
         <EngagementDialog
           song={engagementSong}

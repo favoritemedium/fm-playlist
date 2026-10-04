@@ -90,8 +90,10 @@
       "dismissNotification": "알림 닫기"
     },
     "shareCopied": "Link ready to share",
+    "songDeleted": "Track deleted",
     "errors": {
-      "failedToSave": "Could not update saved tracks"
+      "failedToSave": "Could not update saved tracks",
+      "failedToDelete": "Could not delete track"
     },
     "footer": {
       "track": "{count, plural, other {트랙 #개}}",
@@ -135,6 +137,14 @@
     ,"saved": "Saved"
     ,"removeSaved": "Remove from saved"
     ,"share": "Share"
+    ,"delete": "Delete"
+  },
+  "deleteSongDialog": {
+    "title": "Delete this track?",
+    "description": "This permanently removes the track along with its likes, comments and saves. This cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete",
+    "deleting": "Deleting..."
   },
   "engagement": {
     "likedBy": "좋아요를 누른 사람",

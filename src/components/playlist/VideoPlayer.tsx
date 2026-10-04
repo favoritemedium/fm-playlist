@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
-import { Bookmark, Heart, MessageSquare, Share2 } from "lucide-react";
+import { Bookmark, Heart, MessageSquare, Share2, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Song } from "@/types/song";
 import { formatDateOnlyForDisplay } from "@/lib/dates";
@@ -23,6 +23,8 @@ interface VideoPlayerProps {
   isBookmarkPending?: boolean;
   onBookmarkToggle?: (song: Song) => void;
   onShare?: (song: Song) => void;
+  /** Provided only when the viewer may delete this song (their own). */
+  onDelete?: (song: Song) => void;
 }
 
 export function VideoPlayer({
@@ -37,6 +39,7 @@ export function VideoPlayer({
   isBookmarkPending = false,
   onBookmarkToggle,
   onShare,
+  onDelete,
 }: VideoPlayerProps) {
   const t = useTranslations("videoPlayer");
   const locale = useLocale();
@@ -178,6 +181,17 @@ export function VideoPlayer({
             >
               <Share2 className="size-4 text-secondary" />
               {t("share")}
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              type="button"
+              onClick={() => onDelete(song)}
+              title={t("delete")}
+              className="bg-white text-destructive border-2 border-border hover:border-destructive font-bold rounded-xl"
+            >
+              <Trash2 className="size-4" />
+              {t("delete")}
             </Button>
           )}
         </div>
