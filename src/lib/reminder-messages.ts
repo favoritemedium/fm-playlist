@@ -28,14 +28,13 @@ function formatSubmitterBulletList(submitters: SubmitterSummary[]): string {
 export function buildMondayReminderMessage(appBaseUrl: string): string {
   const url = normalizeAppBaseUrl(appBaseUrl);
   return [
-    "🌟 *Happy Monday!*",
+    "🎵 *Happy Monday!*",
     "",
-    "Let's kick off the week with a fresh round of songs.",
+    "Start the week with some music. Share one track you've been enjoying with the team.",
     "",
-    "* Share one track you've been loving",
-    `* <${url}|Open FM Playlist>`,
+    `▶️ <${url}|Add your song>`,
     "",
-    "_Have a fantastic week ahead!_",
+    `_You can also ask your AI agent to submit a song for you (one per week). <${url}/agent-api.md|Learn how>_`,
   ].join("\n");
 }
 
@@ -53,12 +52,12 @@ export function buildFridayThanksMessage(
   return [
     "🎉 *Happy Friday!*",
     "",
-    "Thanks for keeping the playlist moving this week:",
+    "Thank you to everyone who shared a track this week:",
     submitterList,
     "",
-    `<${url}|Listen to this week's FM Playlist>`,
+    `🎧 <${url}|Listen to this week's picks>`,
     "",
-    "_Have a wonderful weekend!_",
+    "_Have a great weekend!_",
   ].join("\n");
 }
 
@@ -67,10 +66,10 @@ export function buildFridayNoSubmittersMessage(appBaseUrl: string): string {
   return [
     "🎧 *Happy Friday!*",
     "",
-    "No new songs landed in the playlist this week.",
+    "No new songs were added this week. There's still time to share one before the weekend.",
     "",
-    `<${url}|Add a track to start next week's FM Playlist>`,
+    `<${url}|Add a track>`,
     "",
-    "_Have a wonderful weekend!_",
+    "_Have a great weekend!_",
   ].join("\n");
 }

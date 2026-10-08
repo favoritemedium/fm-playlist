@@ -24,17 +24,16 @@ describe("reminder messages", () => {
     ).toBe("Ada, Grace, and Linus");
   });
 
-  it("builds the Monday submission prompt", () => {
+  it("builds the Monday submission prompt with the agent hint", () => {
     expect(buildMondayReminderMessage("https://playlist.example.com/")).toBe(
       [
-        "🌟 *Happy Monday!*",
+        "🎵 *Happy Monday!*",
         "",
-        "Let's kick off the week with a fresh round of songs.",
+        "Start the week with some music. Share one track you've been enjoying with the team.",
         "",
-        "* Share one track you've been loving",
-        "* <https://playlist.example.com|Open FM Playlist>",
+        "▶️ <https://playlist.example.com|Add your song>",
         "",
-        "_Have a fantastic week ahead!_",
+        "_You can also ask your AI agent to submit a song for you (one per week). <https://playlist.example.com/agent-api.md|Learn how>_",
       ].join("\n")
     );
   });
@@ -52,13 +51,13 @@ describe("reminder messages", () => {
       [
         "🎉 *Happy Friday!*",
         "",
-        "Thanks for keeping the playlist moving this week:",
+        "Thank you to everyone who shared a track this week:",
         "* Ada",
         "* Grace",
         "",
-        "<https://playlist.example.com|Listen to this week's FM Playlist>",
+        "🎧 <https://playlist.example.com|Listen to this week's picks>",
         "",
-        "_Have a wonderful weekend!_",
+        "_Have a great weekend!_",
       ].join("\n")
     );
   });
@@ -68,12 +67,19 @@ describe("reminder messages", () => {
       [
         "🎧 *Happy Friday!*",
         "",
-        "No new songs landed in the playlist this week.",
+        "No new songs were added this week. There's still time to share one before the weekend.",
         "",
-        "<https://playlist.example.com|Add a track to start next week's FM Playlist>",
+        "<https://playlist.example.com|Add a track>",
         "",
-        "_Have a wonderful weekend!_",
+        "_Have a great weekend!_",
       ].join("\n")
     );
+  });
+
+  it("mentions AI agents only in the Monday message", () => {
+    const base = "https://playlist.example.com";
+    expect(buildMondayReminderMessage(base)).toContain("AI agent");
+    expect(buildFridayThanksMessage([{ name: "Ada", songCount: 1 }], base)).not.toMatch(/agent/i);
+    expect(buildFridayNoSubmittersMessage(base)).not.toMatch(/agent/i);
   });
 });
