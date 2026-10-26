@@ -48,7 +48,8 @@ Revoke exposed personal agent tokens in **Settings → Agent access**. Their
 SHA-256 hashes and short display prefixes are stored in `agent_tokens`; plaintext
 must not appear in logs, screenshots, URLs, or checked-in fixtures. The ten-token
 cap is enforced in a transaction locked per owner. Agent song submissions use a
-separate per-owner lock to enforce the shared rolling seven-day limit.
+separate per-owner lock to enforce the shared once-per-week limit (weeks start
+Sunday 00:00 in `REMINDER_TIME_ZONE`).
 
 Agent eligibility is checked against the locally stored owner's email. Changes
 to a Clerk account are reflected when its identity is synchronized by the app;

@@ -13,7 +13,12 @@ vi.mock("./db", () => ({
     connect: async () => ({ query: clientQuery, release }),
   }),
 }));
-import { AgentRateLimitError, createAgentSongRow, deleteOwnSong } from "./songs-db";
+import {
+  AgentRateLimitError,
+  createAgentSongRow,
+  deleteOwnSong,
+  getAgentWeekTimeZone,
+} from "./songs-db";
 
 describe("deleteOwnSong", () => {
   beforeEach(() => query.mockReset());
@@ -91,11 +96,14 @@ describe("createAgentSongRow", () => {
 
     const song = await createAgentSongRow(row);
     expect(song).toMatchObject({ id: "db_9", submittedVia: "Claude Code" });
-    expect(sqlOf()).toEqual(["BEGIN", "SELECT", "SELECT", "INSERT", "COMMIT"]);
+    expect(sqlOf()).toEqual(["BEGIN", "SELECT", "WITH", "INSERT", "COMMIT"]);
     expect(clientQuery.mock.calls[1][0]).toContain("pg_advisory_xact_lock");
     // Transactions can begin before a competing submission commits. Evaluate
     // the window after obtaining the lock, not at transaction-start time.
     expect(clientQuery.mock.calls[2][0]).toContain("statement_timestamp()");
+    // Calendar week starting Sunday in the team time zone, not a rolling window.
+    expect(clientQuery.mock.calls[2][0]).toContain("extract(dow FROM ts)");
+    expect(clientQuery.mock.calls[2][1]).toEqual(["user1", "Asia/Singapore"]);
     expect(release).toHaveBeenCalledTimes(1);
   });
 
@@ -108,7 +116,7 @@ describe("createAgentSongRow", () => {
     await expect(createAgentSongRow(row)).rejects.toSatisfy((error: unknown) =>
       error instanceof AgentRateLimitError && error.retryAfterSeconds === 86400
     );
-    expect(sqlOf()).toEqual(["BEGIN", "SELECT", "SELECT", "ROLLBACK"]);
+    expect(sqlOf()).toEqual(["BEGIN", "SELECT", "WITH", "ROLLBACK"]);
     expect(release).toHaveBeenCalledTimes(1);
   });
 
@@ -127,5 +135,13 @@ describe("createAgentSongRow", () => {
     await expect(createAgentSongRow({ ...row, submitted_via: null })).rejects.toThrow();
     await expect(createAgentSongRow({ ...row, submitter_user_id: null })).rejects.toThrow();
     expect(clientQuery).not.toHaveBeenCalled();
+  });
+});
+
+describe("agent weekly limit window", () => {
+  it("uses the team time zone, defaulting to Asia/Singapore", () => {
+    expect(getAgentWeekTimeZone({})).toBe("Asia/Singapore");
+    expect(getAgentWeekTimeZone({ REMINDER_TIME_ZONE: "America/New_York" })).toBe("America/New_York");
+    expect(getAgentWeekTimeZone({ REMINDER_TIME_ZONE: "Not/AZone" })).toBe("Asia/Singapore");
   });
 });

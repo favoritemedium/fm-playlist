@@ -55,7 +55,8 @@ Postgres failures are fatal because Postgres is the sole source of truth.
 - `GET /api/songs` returns public read-only playlist data. `POST /api/songs`
   requires an authenticated user from the allowed domain or a personal agent
   token. Agent submissions receive server-derived ownership and `submittedVia`
-  attribution, with a shared one-per-owner rolling seven-day limit.
+  attribution, with a shared one-per-owner weekly limit that resets Sunday 00:00
+  in `REMINDER_TIME_ZONE`.
 - `GET` / `POST /api/agent-tokens` list/create personal tokens and
   `DELETE /api/agent-tokens/[tokenId]` revokes an owned token. All require a
   permitted Clerk session; bearer agent tokens cannot manage tokens.

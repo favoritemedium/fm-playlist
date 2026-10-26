@@ -4,6 +4,7 @@ import type { Song } from "@/types/song";
 import { toDateOnlyString } from "./dates";
 import { ensureSchema, getPool } from "./db";
 import { EngagementError } from "./engagement-db";
+import { DEFAULT_REMINDER_TIME_ZONE } from "./reminder-config";
 
 export interface SongRow {
   id: number;
@@ -210,8 +211,25 @@ export async function createSongRow(row: SongInsert): Promise<Song> {
   return rowToSong(result.rows[0]);
 }
 
-/** Agents may submit one song per person per rolling week. */
-export const AGENT_SONG_LIMIT_DAYS = 7;
+/**
+ * Agents may submit one song per person per calendar week. Weeks start on
+ * Sunday 00:00 in the team time zone (REMINDER_TIME_ZONE, default
+ * Asia/Singapore), so the allowance resets at the same moment for everyone.
+ */
+export function getAgentWeekTimeZone(
+  env: Record<string, string | undefined> = process.env
+): string {
+  const timeZone = env.REMINDER_TIME_ZONE?.trim();
+  if (timeZone) {
+    try {
+      new Intl.DateTimeFormat("en-US", { timeZone });
+      return timeZone;
+    } catch {
+      // Fall back to the default below.
+    }
+  }
+  return DEFAULT_REMINDER_TIME_ZONE;
+}
 
 export class AgentRateLimitError extends Error {
   constructor(
@@ -219,7 +237,7 @@ export class AgentRateLimitError extends Error {
     readonly availableAt: Date
   ) {
     super(
-      `Agents can submit one song per ${AGENT_SONG_LIMIT_DAYS} days for each person`
+      "Agents can submit one song per week for each person; the limit resets every Sunday at 00:00"
     );
     this.name = "AgentRateLimitError";
   }
@@ -243,17 +261,24 @@ export async function createAgentSongRow(row: SongInsert): Promise<Song> {
       `agent_song:${row.submitter_user_id}`,
     ]);
 
+    // Week bounds are computed in the team time zone, then converted back to
+    // absolute times, so they stay correct across DST changes.
     const recent = await client.query<{ retry_after: number | string }>(
-      `SELECT ceil(extract(epoch FROM (
-                created_at + make_interval(days => $2) - statement_timestamp()
+      `WITH local_now AS (
+         SELECT statement_timestamp() AT TIME ZONE $2 AS ts
+       ), week AS (
+         SELECT date_trunc('day', ts) - make_interval(days => extract(dow FROM ts)::int) AS start_local
+         FROM local_now
+       )
+       SELECT ceil(extract(epoch FROM (
+                ((week.start_local + interval '7 days') AT TIME ZONE $2) - statement_timestamp()
               )))::int AS retry_after
-       FROM songs
-       WHERE submitter_user_id = $1
-         AND submitted_via IS NOT NULL
-         AND created_at > statement_timestamp() - make_interval(days => $2)
-       ORDER BY created_at DESC
+       FROM songs, week
+       WHERE songs.submitter_user_id = $1
+         AND songs.submitted_via IS NOT NULL
+         AND songs.created_at >= (week.start_local AT TIME ZONE $2)
        LIMIT 1`,
-      [row.submitter_user_id, AGENT_SONG_LIMIT_DAYS]
+      [row.submitter_user_id, getAgentWeekTimeZone()]
     );
     if (recent.rows[0]) {
       const retryAfter = Math.max(1, Number(recent.rows[0].retry_after));

@@ -102,9 +102,11 @@ website session. The website displays a `via <agent name>` label.
 
 ### Limits and errors
 
-Agents may submit **one song per person per rolling seven days**, shared across
+Agents may submit **one song per person per week**, shared across
 all of that person's agent tokens. Human submissions through the website do not
 count against the agent limit. Creating a different token does not reset it.
+The week resets every Sunday at 00:00 in the team time zone (Asia/Singapore by
+default), so a song submitted on Saturday does not block one on Sunday.
 
 Errors have `error` (human-readable), `code` (machine-readable), and optional
 `details` (array of strings). Branch on `code`, not message wording.

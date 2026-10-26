@@ -181,4 +181,35 @@ describe.skipIf(!testDatabaseUrl)("agent API against isolated review Postgres", 
     await pool().query("UPDATE songs SET created_at = now() - interval '8 days' WHERE submitter_user_id = $1", [userId]);
     await expect(createAgentSongRow(song())).resolves.toMatchObject({ submitterUserId: userId });
   });
+
+  it("resets the agent allowance at Sunday 00:00 in the team time zone, not after 7 days", async () => {
+    // This week's Sunday 00:00 in Asia/Singapore as an absolute time.
+    const bounds = await pool().query<{ week_start: Date; next_week_start: Date }>(
+      `WITH w AS (
+         SELECT date_trunc('day', now() AT TIME ZONE 'Asia/Singapore')
+                - make_interval(days => extract(dow FROM now() AT TIME ZONE 'Asia/Singapore')::int) AS s
+       )
+       SELECT (s AT TIME ZONE 'Asia/Singapore') AS week_start,
+              ((s + interval '7 days') AT TIME ZONE 'Asia/Singapore') AS next_week_start
+       FROM w`
+    );
+    const { week_start: weekStart, next_week_start: nextWeekStart } = bounds.rows[0];
+
+    // A song one second before this week's Sunday belongs to last week.
+    await createAgentSongRow(song());
+    await pool().query("UPDATE songs SET created_at = $2::timestamptz - interval '1 second' WHERE submitter_user_id = $1", [userId, weekStart]);
+    await expect(createAgentSongRow(song(userId, "Second agent"))).resolves.toMatchObject({ submitterUserId: userId });
+
+    // A song exactly at Sunday 00:00 counts for this week.
+    await pool().query("DELETE FROM songs WHERE submitter_user_id = $1", [userId]);
+    await createAgentSongRow(song());
+    await pool().query("UPDATE songs SET created_at = $2 WHERE submitter_user_id = $1", [userId, weekStart]);
+    const blocked = createAgentSongRow(song(userId, "Third agent"));
+    await expect(blocked).rejects.toBeInstanceOf(AgentRateLimitError);
+    const error = (await blocked.catch((reason: unknown) => reason)) as AgentRateLimitError;
+    // Retry-After points at next Sunday 00:00, not 7 days after the last song.
+    const expected = Math.ceil((nextWeekStart.getTime() - Date.now()) / 1000);
+    expect(Math.abs(error.retryAfterSeconds - expected)).toBeLessThanOrEqual(5);
+    expect(Math.abs(error.availableAt.getTime() - nextWeekStart.getTime())).toBeLessThanOrEqual(5000);
+  });
 });
